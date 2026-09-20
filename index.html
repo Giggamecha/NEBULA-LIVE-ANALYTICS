@@ -1,0 +1,263 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Nebula Analytics Command Center</title>
+<style>
+:root{
+  color-scheme:dark;
+  --bg:#050813;--panel:#0d1528cc;--panel2:#111c34d9;--line:#91a8ff2d;
+  --text:#eef6ff;--muted:#95a9c8;--cyan:#67e8ff;--violet:#a987ff;--blue:#6ea8ff;
+  --green:#68f0ae;--yellow:#ffd36d;--red:#ff6b85;--orange:#ff9d66;
+  --shadow:0 14px 40px #00000042,inset 0 1px 0 #ffffff08;
+}
+*{box-sizing:border-box}html{scroll-behavior:smooth}body{
+  margin:0;min-height:100vh;color:var(--text);font:14px/1.45 Inter,ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,sans-serif;
+  background:
+  radial-gradient(900px 560px at 5% -8%,#67e8ff1e,transparent 58%),
+  radial-gradient(760px 560px at 103% 4%,#a987ff22,transparent 56%),
+  radial-gradient(700px 620px at 52% 105%,#364dcf22,transparent 55%),
+  linear-gradient(180deg,#0a1021,#050813 70%);
+}
+body:before{content:"";position:fixed;inset:0;pointer-events:none;opacity:.5;background-image:
+ radial-gradient(1.5px 1.5px at 12% 18%,#fff8,transparent 50%),
+ radial-gradient(1.2px 1.2px at 68% 9%,#fff6,transparent 50%),
+ radial-gradient(1.4px 1.4px at 87% 43%,#fff5,transparent 50%),
+ radial-gradient(1.2px 1.2px at 38% 67%,#fff4,transparent 50%),
+ radial-gradient(1px 1px at 76% 78%,#fff5,transparent 50%);}
+button,input,select{font:inherit}.wrap{max-width:1320px;margin:auto;padding:22px 18px 42px}
+.glass{border:1px solid var(--line);background:linear-gradient(180deg,#121c34c7,#0a1122df);box-shadow:var(--shadow);backdrop-filter:blur(15px)}
+.hero{border-radius:26px;padding:22px;overflow:hidden;position:relative}.hero:after{content:"";position:absolute;right:-90px;top:-120px;width:310px;height:310px;border-radius:50%;background:#67e8ff12;filter:blur(12px);pointer-events:none}
+.row,.top{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}.brandline{font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:#bed0ee}.live-dot{display:inline-block;width:9px;height:9px;margin-right:8px;border-radius:50%;background:var(--cyan);box-shadow:0 0 16px #67e8ffaa}
+h1{margin:8px 0 5px;font-size:31px;line-height:1.05}h2{margin:0;font-size:16px}h3{margin:0;font-size:13px}.muted{color:var(--muted)}.tiny{font-size:11px}.small{font-size:12px}
+.actions{display:flex;gap:8px;flex-wrap:wrap;align-items:center}.btn,.pill,input,select{border:1px solid var(--line);color:var(--text);background:#ffffff08;border-radius:11px}.btn{padding:10px 13px;cursor:pointer;transition:.16s}.btn:hover{border-color:#91a8ff55;transform:translateY(-1px)}.btn.primary{background:linear-gradient(90deg,#67e8ff22,#a987ff22);border-color:#91b6ff55}.pill{padding:8px 11px}.pill.live{color:#dcffeb;border-color:#68f0ae55;background:#68f0ae0b}
+.setup{margin-top:14px;padding:15px;border:1px solid #ffd36d44;border-radius:16px;background:#56440e22}.setupgrid{display:grid;grid-template-columns:1fr 1fr auto;gap:9px;margin-top:9px}.setup input{padding:11px 12px;width:100%}.hidden{display:none!important}
+.tabs{display:flex;gap:7px;margin:14px 0;overflow:auto;padding-bottom:2px}.tab{white-space:nowrap;padding:9px 13px;border-radius:999px;border:1px solid var(--line);background:#ffffff06;color:var(--muted);cursor:pointer}.tab.active{color:var(--text);background:linear-gradient(90deg,#67e8ff18,#a987ff18);border-color:#91b6ff55}
+.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:14px 0}.card,.panel{border-radius:18px}.card{padding:15px}.metric-label{font-size:10px;letter-spacing:.13em;text-transform:uppercase;color:#b9cae9}.metric{font-size:36px;line-height:1;font-weight:800;letter-spacing:-.035em;margin:7px 0 4px}.metric-sub{font-size:11px;color:var(--muted)}.danger{border-color:#ff6b8550}.danger .metric{color:#ff8ca2}.good .metric{color:#87f5bd}
+.grid2{display:grid;grid-template-columns:1.3fr .9fr;gap:12px}.grid2even{display:grid;grid-template-columns:1fr 1fr;gap:12px}.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}.panel{padding:17px}.panelhead{display:flex;justify-content:space-between;align-items:flex-end;gap:10px;flex-wrap:wrap;margin-bottom:12px}
+.events{display:grid;gap:9px;max-height:540px;overflow:auto}.event,.softbox{padding:11px 12px;border:1px solid #ffffff0d;background:#ffffff05;border-radius:14px}.bar{height:8px;border-radius:999px;overflow:hidden;background:#ffffff0d;margin-top:7px}.fill{height:100%;border-radius:999px;background:linear-gradient(90deg,var(--cyan),var(--violet));box-shadow:0 0 16px #67e8ff22}.fill.red{background:linear-gradient(90deg,var(--red),var(--orange));box-shadow:0 0 16px #ff6b8528}
+.funnel{display:grid;gap:8px}.funnelrow{padding:11px;border-radius:14px;border:1px solid #ffffff0d;background:#ffffff05}.funnel-num{font-weight:800;font-size:16px}.flag{padding:11px 12px;border-radius:14px;border:1px solid #ffffff0d;background:#ffffff05;margin-top:8px}.flag.bad{border-color:#ff6b8544}.flag.warn{border-color:#ffd36d44}
+.rangebar{display:flex;gap:8px;align-items:center;flex-wrap:wrap}.rangebar select{padding:8px 10px}
+.chart{height:190px;display:flex;align-items:flex-end;gap:5px;padding-top:12px;border-bottom:1px solid #ffffff10}.daybar{flex:1;min-width:5px;background:linear-gradient(180deg,#67e8ffcc,#786ef8aa);border-radius:6px 6px 0 0;position:relative;transition:.15s}.daybar:hover{filter:brightness(1.25)}.chartlabels{display:flex;justify-content:space-between;color:var(--muted);font-size:10px;margin-top:6px}
+.ranklist{display:grid;gap:8px}.rankrow{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:10px;align-items:center}.rankname{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.mini{height:6px;background:#ffffff0c;border-radius:99px;overflow:hidden;margin-top:5px}.minifill{height:100%;background:linear-gradient(90deg,#6ea8ff,#a987ff)}
+table{width:100%;border-collapse:collapse}th,td{text-align:left;padding:10px 7px;border-bottom:1px solid #ffffff0d;font-size:12px;vertical-align:top}th{color:#b7c8e7;text-transform:uppercase;letter-spacing:.07em;font-size:10px}.scrollx{overflow:auto}
+.diaggrid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}.diag{padding:12px;border-radius:14px;background:#ffffff05;border:1px solid #ffffff0d}.ok{color:var(--green)}.warn{color:var(--yellow)}.bad{color:var(--red)}
+.log{padding:12px;white-space:pre-wrap;word-break:break-word;max-height:240px;overflow:auto;border-radius:14px;background:#040711;border:1px solid #ffffff0d;color:#b9c9e5;font:11px/1.5 ui-monospace,SFMono-Regular,Consolas,monospace}
+.coverage{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}.coverage .softbox b{display:block;margin-bottom:3px}.footer{margin-top:16px;color:var(--muted);font-size:11px}
+.loading{opacity:.55}.section{margin-top:12px}
+@media(max-width:1050px){.kpis{grid-template-columns:repeat(2,1fr)}.grid2,.grid2even{grid-template-columns:1fr}.grid3{grid-template-columns:1fr 1fr}}
+@media(max-width:700px){.wrap{padding:14px}.setupgrid,.grid3,.diaggrid,.coverage{grid-template-columns:1fr}.metric{font-size:30px}.hero{padding:17px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<section class="hero glass">
+ <div class="top">
+  <div>
+   <div class="brandline"><span class="live-dot"></span>NEBULA • ANALYTICS COMMAND CENTER</div>
+   <h1>Player, Gameplay & Web Health</h1>
+   <div class="muted">Realtime telemetry, historical trends, acquisition, devices, funnels, error classification and telemetry QA. <span class="tiny">API-compatible build 2.1</span></div>
+  </div>
+  <div class="actions">
+   <span id="status" class="pill">● Not connected</span>
+   <button id="refreshBtn" class="btn">Refresh all</button>
+   <button id="authBtn" class="btn primary">Connect Google Analytics</button>
+  </div>
+ </div>
+ <div id="setup" class="setup">
+  <b>One-time setup</b>
+  <div class="small muted">Enter the non-secret OAuth Web Client ID and your Google Cloud Project ID. Never paste a client secret or service-account key here.</div>
+  <div class="setupgrid">
+   <input id="clientId" placeholder="OAuth Client ID (...apps.googleusercontent.com)">
+   <input id="projectId" placeholder="Google Cloud Project ID">
+   <button id="saveBtn" class="btn primary">Save setup</button>
+  </div>
+ </div>
+</section>
+
+<nav class="tabs">
+ <button class="tab active" data-tab="live">Live</button>
+ <button class="tab" data-tab="overview">Overview</button>
+ <button class="tab" data-tab="gameplay">Gameplay</button>
+ <button class="tab" data-tab="stability">Web Stability</button>
+ <button class="tab" data-tab="audience">Audience</button>
+ <button class="tab" data-tab="acquisition">Acquisition</button>
+ <button class="tab" data-tab="telemetry">Telemetry QA</button>
+</nav>
+
+<div id="live" class="page">
+ <section class="kpis">
+  <div class="card glass good"><div class="metric-label">Active now</div><div id="liveActive" class="metric">—</div><div class="metric-sub">users in the last 30 minutes</div></div>
+  <div class="card glass"><div class="metric-label">Live events</div><div id="liveEvents" class="metric">—</div><div class="metric-sub">all events in the last 30 minutes</div></div>
+  <div class="card glass"><div class="metric-label">Gameplay starts</div><div id="liveStarts" class="metric">—</div><div class="metric-sub">nebula_gameplay_started</div></div>
+  <div class="card glass danger"><div class="metric-label">Web errors</div><div id="liveErrors" class="metric">—</div><div class="metric-sub">nebula_web_error</div></div>
+ </section>
+ <section class="grid2">
+  <div class="panel glass"><div class="panelhead"><div><h2>Realtime event stream</h2><div class="small muted">Last 30 minutes • auto-refresh every 15 seconds</div></div><span id="updated" class="small muted">Waiting</span></div><div id="liveEventList" class="events"><div class="muted">Connect Google Analytics to begin.</div></div></div>
+  <div class="panel glass"><h2>Live gameplay activity</h2><div id="liveFunnel" class="funnel section"></div><h2 class="section">Live QA flags</h2><div id="liveFlags"></div></div>
+ </section>
+</div>
+
+<div id="overview" class="page hidden">
+ <div class="rangebar"><span class="muted">Historical window</span><select id="rangeSelect"><option value="7">Last 7 days</option><option value="30" selected>Last 30 days</option><option value="90">Last 90 days</option></select><button id="reloadHistory" class="btn">Reload</button></div>
+ <section class="kpis">
+  <div class="card glass"><div class="metric-label">Active users</div><div id="histUsers" class="metric">—</div><div class="metric-sub">selected period</div></div>
+  <div class="card glass"><div class="metric-label">New users</div><div id="histNew" class="metric">—</div><div class="metric-sub">selected period</div></div>
+  <div class="card glass"><div class="metric-label">Sessions</div><div id="histSessions" class="metric">—</div><div class="metric-sub">selected period</div></div>
+  <div class="card glass"><div class="metric-label">Engagement rate</div><div id="histEngagement" class="metric">—</div><div class="metric-sub">engaged sessions / sessions</div></div>
+ </section>
+ <section class="grid2">
+  <div class="panel glass"><div class="panelhead"><div><h2>Daily event trend</h2><div class="small muted">All GA4 events by day</div></div><div id="trendTotal" class="small muted"></div></div><div id="trendChart" class="chart"></div><div id="trendLabels" class="chartlabels"></div></div>
+  <div class="panel glass"><h2>Session quality</h2><div id="qualityList" class="section"></div></div>
+ </section>
+ <section class="panel glass section"><h2>Top events</h2><div id="histEventList" class="ranklist section"></div></section>
+</div>
+
+<div id="gameplay" class="page hidden">
+ <section class="grid2">
+  <div class="panel glass"><div class="panelhead"><div><h2>Gameplay stage reach</h2><div class="small muted">Uses unique active users per event, not raw event-count conversion.</div></div></div><div id="histFunnel" class="funnel"></div></div>
+  <div class="panel glass"><h2>Gameplay event volume</h2><div id="gameEventVolume" class="ranklist section"></div></div>
+ </section>
+ <section class="grid3 section">
+  <div class="panel glass"><h2>Song source</h2><div id="sourceBreakdown" class="section muted">Checking whether <code>source</code> is registered as a custom dimension…</div></div>
+  <div class="panel glass"><h2>Difficulty</h2><div id="difficultyBreakdown" class="section muted">Checking whether <code>difficulty</code> is registered…</div></div>
+  <div class="panel glass"><h2>Gameplay outcomes</h2><div id="outcomeBreakdown" class="section muted">Checking whether <code>outcome</code> is registered…</div></div>
+ </section>
+ <section class="grid2even section">
+  <div class="panel glass"><h2>Screen activity</h2><div id="screenBreakdown" class="section muted">Checking whether <code>screen_name</code> is registered…</div></div>
+  <div class="panel glass"><h2>Chart origin</h2><div id="chartOriginBreakdown" class="section muted">Checking whether <code>chart_origin</code> is registered…</div></div>
+ </section>
+</div>
+
+<div id="stability" class="page hidden">
+ <section class="kpis">
+  <div class="card glass danger"><div class="metric-label">Errors in period</div><div id="periodErrors" class="metric">—</div><div class="metric-sub">nebula_web_error</div></div>
+  <div class="card glass"><div class="metric-label">Error-affected users</div><div id="errorUsers" class="metric">—</div><div class="metric-sub">unique users firing error event</div></div>
+  <div class="card glass"><div class="metric-label">Errors / gameplay start</div><div id="errorsPerStart" class="metric">—</div><div class="metric-sub">diagnostic ratio</div></div>
+  <div class="card glass"><div class="metric-label">Current version rows</div><div id="versionRowsCount" class="metric">—</div><div class="metric-sub">processed custom-dimension rows</div></div>
+ </section>
+ <section class="panel glass"><h2>Error classifier</h2><div class="small muted">Area × error code × app version. New custom dimensions can lag behind Realtime.</div><div class="scrollx"><table><thead><tr><th>Area</th><th>Error code</th><th>Version</th><th>Count</th></tr></thead><tbody id="errorTable"><tr><td colspan="4" class="muted">Waiting for processed data.</td></tr></tbody></table></div></section>
+ <section class="panel glass section"><h2>Release/version health</h2><div class="small muted">Compares Web error events and gameplay starts by your custom <code>app_version</code> parameter.</div><div id="versionHealth" class="section"></div></section>
+</div>
+
+<div id="audience" class="page hidden">
+ <section class="grid2even">
+  <div class="panel glass"><h2>Devices & operating systems</h2><div id="deviceList" class="ranklist section"></div></div>
+  <div class="panel glass"><h2>Countries</h2><div id="countryList" class="ranklist section"></div></div>
+ </section>
+</div>
+
+<div id="acquisition" class="page hidden">
+ <section class="grid2">
+  <div class="panel glass"><h2>Session source / medium</h2><div id="sourceMediumList" class="ranklist section"></div></div>
+  <div class="panel glass"><h2>Acquisition notes</h2><div class="softbox section"><b>Direct</b><div class="small muted">Typed/bookmarked/unattributed navigation.</div></div><div class="softbox section"><b>Referral / AI / social</b><div class="small muted">Useful once external traffic grows enough to compare.</div></div><div class="softbox section"><b>Do not overread tiny samples</b><div class="small muted">A handful of users can make channel percentages look profound. They are not.</div></div></div>
+ </section>
+</div>
+
+<div id="telemetry" class="page hidden">
+ <section class="diaggrid">
+  <div class="diag"><div class="metric-label">OAuth</div><b id="diagOAuth">Not connected</b></div>
+  <div class="diag"><div class="metric-label">Realtime API</div><b id="diagRealtime">Not tested</b></div>
+  <div class="diag"><div class="metric-label">Reporting API</div><b id="diagReporting">Not tested</b></div>
+ </section>
+ <section class="panel glass section"><h2>Telemetry coverage</h2><div class="coverage section" id="coverage"></div></section>
+ <section class="panel glass section"><div class="panelhead"><div><h2>Diagnostics log</h2><div class="small muted">Useful when Google decides to communicate entirely through 403s.</div></div><button id="clearLog" class="btn">Clear</button></div><div id="diagLog" class="log">Ready.</div></section>
+</div>
+
+<div class="footer">Realtime refresh: 15s. Historical refresh: manual / on connect. OAuth tokens stay in memory only. Only the non-secret OAuth Client ID and Google Cloud Project ID are saved locally.</div>
+</div>
+
+<script>
+const PROPERTY='554874001',SCOPE='https://www.googleapis.com/auth/analytics.readonly';
+const RT=`https://analyticsdata.googleapis.com/v1beta/properties/${PROPERTY}:runRealtimeReport`;
+const RP=`https://analyticsdata.googleapis.com/v1beta/properties/${PROPERTY}:runReport`;
+let token=null,tokenClient=null,liveTimer=null,currentRange=30,histEvents={},histEventUsers={};
+const $=id=>document.getElementById(id);
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const pct=x=>Number.isFinite(x)?(x*100).toFixed(x*100<10?1:0)+'%':'—';
+const fmt=x=>Number(x||0).toLocaleString();
+const sec=x=>{x=Number(x||0);if(x<60)return x.toFixed(0)+'s';return Math.floor(x/60)+'m '+Math.round(x%60)+'s'};
+function log(msg){const e=$('diagLog'),t=new Date().toLocaleTimeString();e.textContent+=`\\n[${t}] ${msg}`;e.scrollTop=e.scrollHeight}
+function setStatus(t,on=false){$('status').textContent='● '+t;$('status').className='pill'+(on?' live':'')}
+function d(id,t,cls=''){const e=$(id);e.textContent=t;e.className=cls}
+function saved(){ $('clientId').value=localStorage.getItem('nebula_client')||'';$('projectId').value=localStorage.getItem('nebula_project')||'';if($('clientId').value&&$('projectId').value)$('setup').classList.add('hidden')}saved();
+function loadGIS(){return new Promise((ok,no)=>{if(window.google?.accounts?.oauth2)return ok();let s=document.createElement('script');s.src='https://accounts.google.com/gsi/client';s.async=true;s.defer=true;s.onload=ok;s.onerror=()=>no(Error('Could not load Google Identity Services'));document.head.appendChild(s)})}
+async function connect(){
+ try{
+  const c=$('clientId').value.trim()||localStorage.getItem('nebula_client'),p=$('projectId').value.trim()||localStorage.getItem('nebula_project');
+  if(!c||!p){$('setup').classList.remove('hidden');throw Error('Client ID and Project ID are required.')}
+  await loadGIS();
+  tokenClient=google.accounts.oauth2.initTokenClient({client_id:c,scope:SCOPE,callback:r=>{
+   if(r.error){d('diagOAuth','Failed','bad');setStatus('OAuth failed');log('OAuth error: '+JSON.stringify(r));return}
+   token=r.access_token;d('diagOAuth','Connected','ok');setStatus('Connected',true);$('setup').classList.add('hidden');log('OAuth connected. Loading live and historical reports.');refreshAll();clearInterval(liveTimer);liveTimer=setInterval(loadLive,15000)
+  }});
+  tokenClient.requestAccessToken({prompt:''});
+ }catch(e){setStatus(e.message);log(e.message)}
+}
+async function api(url,body){
+ if(!token)throw Error('Not connected');
+ const project=$('projectId').value.trim()||localStorage.getItem('nebula_project');
+ let r=await fetch(url,{method:'POST',headers:{Authorization:'Bearer '+token,'Content-Type':'application/json','x-goog-user-project':project},body:JSON.stringify(body)});
+ let txt=await r.text(),j={};try{j=txt?JSON.parse(txt):{}}catch{}
+ if(!r.ok){let reason=j.error?.details?.[0]?.reason||j.error?.status||'';throw Error((j.error?.message||`HTTP ${r.status}`)+(reason?` [${reason}]`:''))}
+ return j
+}
+function eventRows(j){return (j.rows||[]).map(r=>({name:r.dimensionValues?.[0]?.value||'(unknown)',count:+(r.metricValues?.[0]?.value||0),users:+(r.metricValues?.[1]?.value||0)}))}
+async function loadLive(){
+ try{
+  let j=await api(RT,{dimensions:[{name:'eventName'}],metrics:[{name:'eventCount'}],minuteRanges:[{startMinutesAgo:29,endMinutesAgo:0}],orderBys:[{metric:{metricName:'eventCount'},desc:true}],limit:'100'});
+  const rows=eventRows(j),m={};let total=0;rows.forEach(r=>{m[r.name]=r.count;total+=r.count});
+  let a=await api(RT,{metrics:[{name:'activeUsers'}],minuteRanges:[{startMinutesAgo:29,endMinutesAgo:0}]});let active=+(a.rows?.[0]?.metricValues?.[0]?.value||0);
+  $('liveActive').textContent=fmt(active);$('liveEvents').textContent=fmt(total);$('liveStarts').textContent=fmt(m.nebula_gameplay_started||0);$('liveErrors').textContent=fmt(m.nebula_web_error||0);
+  renderLiveEvents(rows);renderLiveFunnel(m);renderLiveFlags(m,total,active);$('updated').textContent='Updated '+new Date().toLocaleTimeString();
+  d('diagRealtime',rows.length?`Working • ${rows.length} event types`:'Working • no live events','ok');log(`Realtime: ${total} events, ${active} active users. eventName is queried with eventCount only; activeUsers is queried separately for GA4 Realtime compatibility.`);
+ }catch(e){d('diagRealtime','Failed','bad');setStatus('Realtime API error');log('Realtime ERROR: '+e.message)}
+}
+function renderLiveEvents(rows){const mx=Math.max(1,...rows.map(r=>r.count));$('liveEventList').innerHTML=rows.length?rows.map(r=>`<div class="event"><div class="row"><span>${esc(r.name)}</span><b>${fmt(r.count)}</b></div><div class="bar"><div class="fill ${r.name==='nebula_web_error'?'red':''}" style="width:${Math.max(3,r.count/mx*100)}%"></div></div></div>`).join(''):'<div class="muted">Realtime API works. No events in the last 30 minutes.</div>'}
+function renderLiveFunnel(m){let s=[['Launch','nebula_game_launch'],['Onboarding completed','nebula_onboarding_completed'],['Calibration completed','nebula_calibration_completed'],['Song selected','nebula_song_selected'],['Chart generated','nebula_chart_generated'],['Gameplay started','nebula_gameplay_started'],['Gameplay ended','nebula_gameplay_ended']];$('liveFunnel').innerHTML=s.map(([n,k],i)=>`<div class="funnelrow row" style="margin-left:${i*5}px"><span>${n}</span><span class="funnel-num">${fmt(m[k]||0)}</span></div>`).join('')}
+function renderLiveFlags(m,total,active){let o=[];if(m.nebula_web_error)o.push(`<div class="flag bad"><b>${m.nebula_web_error} Web error${m.nebula_web_error===1?'':'s'}</b><div class="small muted">Inspect Stability when processed dimensions catch up.</div></div>`);if((m.nebula_chart_generated||0)>(m.nebula_song_selected||0)&&(m.nebula_song_selected||0)>0)o.push(`<div class="flag warn"><b>Chart generations exceed selections</b><div class="small muted">Could be deliberate retesting or duplicate emission.</div></div>`);if(!o.length)o.push(`<div class="flag"><b>No obvious live telemetry anomaly</b><div class="small muted">${active} active • ${total} events.</div></div>`);$('liveFlags').innerHTML=o.join('')}
+
+async function report(dimensions,metrics,extra={}){
+ return api(RP,{dateRanges:[{startDate:`${currentRange}daysAgo`,endDate:'today'}],dimensions:dimensions.map(name=>({name})),metrics:metrics.map(name=>({name})),...extra})
+}
+async function loadHistory(){
+ try{
+  currentRange=+$('rangeSelect').value;
+  const summary=await report([],['activeUsers','newUsers','sessions','engagedSessions','engagementRate','averageSessionDuration','userEngagementDuration','eventCount','sessionsPerUser']);
+  let v=summary.rows?.[0]?.metricValues||[],n=i=>+(v[i]?.value||0);
+  $('histUsers').textContent=fmt(n(0));$('histNew').textContent=fmt(n(1));$('histSessions').textContent=fmt(n(2));$('histEngagement').textContent=pct(n(4));
+  $('qualityList').innerHTML=[
+   ['Engaged sessions',fmt(n(3))],['Average session duration',sec(n(5))],['Average engagement / active user',sec(n(0)>0?n(6)/n(0):0)],['Total engagement time',sec(n(6))],['Total events',fmt(n(7))],['Sessions / user',n(8).toFixed(2)]
+  ].map(([a,b])=>`<div class="softbox row"><span>${a}</span><b>${b}</b></div>`).join('');
+  await Promise.all([loadTrend(),loadHistoricalEvents(),loadAudience(),loadAcquisition(),loadErrorClassifier(),loadVersionHealth(),loadOptionalBreakdowns()]);
+  d('diagReporting','Working','ok');log(`Historical reports loaded for ${currentRange} days.`);
+ }catch(e){d('diagReporting','Failed','bad');log('Reporting ERROR: '+e.message)}
+}
+async function loadTrend(){let j=await report(['date'],['eventCount'],{orderBys:[{dimension:{dimensionName:'date'}}]});let rows=(j.rows||[]).map(r=>({d:r.dimensionValues[0].value,v:+r.metricValues[0].value})),mx=Math.max(1,...rows.map(x=>x.v)),sum=rows.reduce((a,x)=>a+x.v,0);$('trendTotal').textContent=fmt(sum)+' events';$('trendChart').innerHTML=rows.map(x=>`<div class="daybar" title="${x.d}: ${x.v} events" style="height:${Math.max(3,x.v/mx*100)}%"></div>`).join('');if(rows.length){let f=formatDate(rows[0].d),l=formatDate(rows[rows.length-1].d);$('trendLabels').innerHTML=`<span>${f}</span><span>${l}</span>`}else $('trendChart').innerHTML='<div class="muted">No trend data.</div>'}
+function formatDate(s){if(!s||s.length<8)return s;return s.slice(4,6)+'/'+s.slice(6,8)}
+async function loadHistoricalEvents(){let j=await report(['eventName'],['eventCount','activeUsers'],{orderBys:[{metric:{metricName:'eventCount'},desc:true}],limit:'100'});let rows=eventRows(j);histEvents={};histEventUsers={};rows.forEach(r=>{histEvents[r.name]=r.count;histEventUsers[r.name]=r.users});rank('histEventList',rows.slice(0,20).map(r=>[r.name,r.count,`${r.users} users`]));renderHistFunnel(rows);renderGameVolume(rows);let e=histEvents.nebula_web_error||0,s=histEvents.nebula_gameplay_started||0;$('periodErrors').textContent=fmt(e);$('errorUsers').textContent=fmt(histEventUsers.nebula_web_error||0);$('errorsPerStart').textContent=s?(e/s).toFixed(2):'—'}
+function renderHistFunnel(rows){let steps=[['Launch','nebula_game_launch'],['Onboarding started','nebula_onboarding_started'],['Onboarding completed','nebula_onboarding_completed'],['Calibration completed','nebula_calibration_completed'],['Song selected','nebula_song_selected'],['Chart generated','nebula_chart_generated'],['Gameplay started','nebula_gameplay_started'],['Gameplay ended','nebula_gameplay_ended'],['Results viewed','nebula_results_viewed']];$('histFunnel').innerHTML=steps.map(([n,k],i)=>`<div class="funnelrow row"><div><b>${n}</b><div class="tiny muted">${fmt(histEvents[k]||0)} events</div></div><span class="funnel-num">${fmt(histEventUsers[k]||0)} users</span></div>`).join('')}
+function renderGameVolume(rows){let r=rows.filter(x=>x.name.startsWith('nebula_')).sort((a,b)=>b.count-a.count);rank('gameEventVolume',r.map(x=>[x.name,x.count,`${x.users} users`]))}
+function rank(id,items){let mx=Math.max(1,...items.map(x=>x[1]));$(id).innerHTML=items.length?items.map(([n,v,sub])=>`<div class="rankrow"><div><div class="rankname">${esc(n)}</div><div class="mini"><div class="minifill" style="width:${v/mx*100}%"></div></div>${sub?`<div class="tiny muted">${esc(sub)}</div>`:''}</div><b>${fmt(v)}</b></div>`).join(''):'<div class="muted">No data.</div>'}
+async function loadAudience(){let [dev,country]=await Promise.all([report(['deviceCategory','operatingSystem'],['activeUsers','sessions'],{orderBys:[{metric:{metricName:'activeUsers'},desc:true}],limit:'20'}),report(['country'],['activeUsers','sessions'],{orderBys:[{metric:{metricName:'activeUsers'},desc:true}],limit:'20'})]);rank('deviceList',(dev.rows||[]).map(r=>[`${r.dimensionValues[0].value} • ${r.dimensionValues[1].value}`,+(r.metricValues[0].value||0),`${r.metricValues[1].value} sessions`]));rank('countryList',(country.rows||[]).map(r=>[r.dimensionValues[0].value,+(r.metricValues[0].value||0),`${r.metricValues[1].value} sessions`]))}
+async function loadAcquisition(){let j=await report(['sessionSourceMedium'],['sessions','activeUsers'],{orderBys:[{metric:{metricName:'sessions'},desc:true}],limit:'30'});rank('sourceMediumList',(j.rows||[]).map(r=>[r.dimensionValues[0].value,+(r.metricValues[0].value||0),`${r.metricValues[1].value} users`]))}
+async function loadErrorClassifier(){try{let j=await report(['customEvent:area','customEvent:error_code','customEvent:app_version'],['eventCount'],{dimensionFilter:{filter:{fieldName:'eventName',stringFilter:{matchType:'EXACT',value:'nebula_web_error'}}},orderBys:[{metric:{metricName:'eventCount'},desc:true}],limit:'100'});let rows=j.rows||[];$('versionRowsCount').textContent=fmt(rows.length);$('errorTable').innerHTML=rows.length?rows.map(r=>`<tr><td>${esc(r.dimensionValues[0].value)}</td><td>${esc(r.dimensionValues[1].value)}</td><td>${esc(r.dimensionValues[2].value)}</td><td>${fmt(r.metricValues[0].value)}</td></tr>`).join(''):'<tr><td colspan="4" class="muted">No processed post-registration errors yet.</td></tr>'}catch(e){$('versionRowsCount').textContent='—';$('errorTable').innerHTML=`<tr><td colspan="4" class="muted">${esc(e.message)}</td></tr>`;log('Custom error dimensions: '+e.message)}}
+async function loadVersionHealth(){try{let j=await report(['customEvent:app_version','eventName'],['eventCount'],{dimensionFilter:{inListFilter:{fieldName:'eventName',values:['nebula_web_error','nebula_gameplay_started','nebula_gameplay_ended']}},limit:'200'});let m={};(j.rows||[]).forEach(r=>{let ver=r.dimensionValues[0].value||'(not set)',ev=r.dimensionValues[1].value,c=+r.metricValues[0].value;(m[ver]??={})[ev]=c});let rows=Object.entries(m);$('versionHealth').innerHTML=rows.length?rows.map(([v,o])=>{let er=o.nebula_web_error||0,st=o.nebula_gameplay_started||0,en=o.nebula_gameplay_ended||0;return `<div class="softbox row"><div><b>${esc(v)}</b><div class="tiny muted">${st} starts • ${en} ends</div></div><div class="${er?'bad':'ok'}"><b>${er} errors</b></div></div>`}).join(''):'<div class="muted">No processed version data yet.</div>'}catch(e){$('versionHealth').innerHTML='<div class="muted">Version dimension is still processing or unavailable.</div>'}}
+async function optionalDimension(id,dim,eventNames,label){try{let j=await report([`customEvent:${dim}`],['eventCount'],{dimensionFilter:{inListFilter:{fieldName:'eventName',values:eventNames}},orderBys:[{metric:{metricName:'eventCount'},desc:true}],limit:'30'});let rows=j.rows||[];rank(id,rows.map(r=>[r.dimensionValues[0].value,+(r.metricValues[0].value||0),'events']));return true}catch(e){$(id).innerHTML=`<div class="flag warn"><b>${label} is not reportable yet</b><div class="small muted">Register event parameter <code>${dim}</code> as an Event-scoped custom dimension in GA4 if you want this breakdown.</div></div>`;return false}}
+async function loadOptionalBreakdowns(){let results=await Promise.all([
+ optionalDimension('sourceBreakdown','source',['nebula_song_selected','nebula_gameplay_started','nebula_gameplay_ended'],'Song source'),
+ optionalDimension('difficultyBreakdown','difficulty',['nebula_song_selected','nebula_gameplay_started','nebula_gameplay_ended'],'Difficulty'),
+ optionalDimension('outcomeBreakdown','outcome',['nebula_gameplay_ended'],'Gameplay outcome'),
+ optionalDimension('screenBreakdown','screen_name',['nebula_screen_view'],'Screen name'),
+ optionalDimension('chartOriginBreakdown','chart_origin',['nebula_song_selected','nebula_gameplay_started','nebula_gameplay_ended'],'Chart origin')
+ ]);renderCoverage(results)}
+function renderCoverage(optional=[]){let core=['nebula_game_launch','nebula_screen_view','nebula_song_selected','nebula_chart_generated','nebula_gameplay_started','nebula_gameplay_ended','nebula_web_error'];let boxes=core.map(e=>`<div class="softbox"><b>${esc(e)}</b><div class="small ${histEvents[e]?'ok':'muted'}">${histEvents[e]?`${fmt(histEvents[e])} events in range`:'No events in selected range'}</div></div>`);let names=['source','difficulty','outcome','screen_name','chart_origin'];optional.forEach((ok,i)=>boxes.push(`<div class="softbox"><b>customEvent:${names[i]}</b><div class="small ${ok?'ok':'warn'}">${ok?'Reportable':'Not registered / unavailable'}</div></div>`));$('coverage').innerHTML=boxes.join('')}
+async function refreshAll(){if(!token)return;await loadLive();await loadHistory()}
+$('authBtn').onclick=connect;$('refreshBtn').onclick=refreshAll;$('reloadHistory').onclick=loadHistory;$('rangeSelect').onchange=loadHistory;
+$('saveBtn').onclick=()=>{let c=$('clientId').value.trim(),p=$('projectId').value.trim();if(!c||!p){log('Both setup fields are required.');return}localStorage.setItem('nebula_client',c);localStorage.setItem('nebula_project',p);$('setup').classList.add('hidden');setStatus('Setup saved');log('Saved Client ID and Project ID locally.')};
+$('clearLog').onclick=()=>{$('diagLog').textContent='Cleared.'};
+document.querySelectorAll('.tab').forEach(b=>b.onclick=()=>{document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));b.classList.add('active');document.querySelectorAll('.page').forEach(x=>x.classList.add('hidden'));$(b.dataset.tab).classList.remove('hidden')});
+renderCoverage();
+</script>
+</body></html>
