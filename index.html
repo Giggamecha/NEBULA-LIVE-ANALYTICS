@@ -1,0 +1,538 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Nebula Analytics Command Center</title>
+<style>
+:root{
+  color-scheme:dark;
+  --bg:#050813;--panel:#0d1528cc;--panel2:#111c34d9;--line:#91a8ff2d;
+  --text:#eef6ff;--muted:#95a9c8;--cyan:#67e8ff;--violet:#a987ff;--blue:#6ea8ff;
+  --green:#68f0ae;--yellow:#ffd36d;--red:#ff6b85;--orange:#ff9d66;
+  --shadow:0 14px 40px #00000042,inset 0 1px 0 #ffffff08;
+}
+*{box-sizing:border-box}html{scroll-behavior:smooth}body{
+  margin:0;min-height:100vh;color:var(--text);font:14px/1.45 Inter,ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,sans-serif;
+  background:
+  radial-gradient(900px 560px at 5% -8%,#67e8ff1e,transparent 58%),
+  radial-gradient(760px 560px at 103% 4%,#a987ff22,transparent 56%),
+  radial-gradient(700px 620px at 52% 105%,#364dcf22,transparent 55%),
+  linear-gradient(180deg,#0a1021,#050813 70%);
+}
+body:before{content:"";position:fixed;inset:0;pointer-events:none;opacity:.5;background-image:
+ radial-gradient(1.5px 1.5px at 12% 18%,#fff8,transparent 50%),
+ radial-gradient(1.2px 1.2px at 68% 9%,#fff6,transparent 50%),
+ radial-gradient(1.4px 1.4px at 87% 43%,#fff5,transparent 50%),
+ radial-gradient(1.2px 1.2px at 38% 67%,#fff4,transparent 50%),
+ radial-gradient(1px 1px at 76% 78%,#fff5,transparent 50%);}
+button,input,select{font:inherit}.wrap{max-width:1320px;margin:auto;padding:22px 18px 42px}
+.glass{border:1px solid var(--line);background:linear-gradient(180deg,#121c34c7,#0a1122df);box-shadow:var(--shadow);backdrop-filter:blur(15px)}
+.hero{border-radius:26px;padding:22px;overflow:hidden;position:relative}.hero:after{content:"";position:absolute;right:-90px;top:-120px;width:310px;height:310px;border-radius:50%;background:#67e8ff12;filter:blur(12px);pointer-events:none}
+.row,.top{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}.brandline{font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:#bed0ee}.live-dot{display:inline-block;width:9px;height:9px;margin-right:8px;border-radius:50%;background:var(--cyan);box-shadow:0 0 16px #67e8ffaa}
+h1{margin:8px 0 5px;font-size:31px;line-height:1.05}h2{margin:0;font-size:16px}h3{margin:0;font-size:13px}.muted{color:var(--muted)}.tiny{font-size:11px}.small{font-size:12px}
+.actions{display:flex;gap:8px;flex-wrap:wrap;align-items:center}.btn,.pill,input,select{border:1px solid var(--line);color:var(--text);background:#ffffff08;border-radius:11px}.btn{padding:10px 13px;cursor:pointer;transition:.16s}.btn:hover{border-color:#91a8ff55;transform:translateY(-1px)}.btn.primary{background:linear-gradient(90deg,#67e8ff22,#a987ff22);border-color:#91b6ff55}.pill{padding:8px 11px}.pill.live{color:#dcffeb;border-color:#68f0ae55;background:#68f0ae0b}
+.setup{margin-top:14px;padding:15px;border:1px solid #ffd36d44;border-radius:16px;background:#56440e22}.setupgrid{display:grid;grid-template-columns:1fr 1fr auto;gap:9px;margin-top:9px}.setup input{padding:11px 12px;width:100%}.hidden{display:none!important}
+.tabs{display:flex;gap:7px;margin:14px 0;overflow:auto;padding-bottom:2px}.tab{white-space:nowrap;padding:9px 13px;border-radius:999px;border:1px solid var(--line);background:#ffffff06;color:var(--muted);cursor:pointer}.tab.active{color:var(--text);background:linear-gradient(90deg,#67e8ff18,#a987ff18);border-color:#91b6ff55}
+.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:14px 0}.card,.panel{border-radius:18px}.card{padding:15px}.metric-label{font-size:10px;letter-spacing:.13em;text-transform:uppercase;color:#b9cae9}.metric{font-size:36px;line-height:1;font-weight:800;letter-spacing:-.035em;margin:7px 0 4px}.metric-sub{font-size:11px;color:var(--muted)}.danger{border-color:#ff6b8550}.danger .metric{color:#ff8ca2}.good .metric{color:#87f5bd}
+.grid2{display:grid;grid-template-columns:1.3fr .9fr;gap:12px}.grid2even{display:grid;grid-template-columns:1fr 1fr;gap:12px}.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}.panel{padding:17px}.panelhead{display:flex;justify-content:space-between;align-items:flex-end;gap:10px;flex-wrap:wrap;margin-bottom:12px}
+.events{display:grid;gap:9px;max-height:540px;overflow:auto}.event,.softbox{padding:11px 12px;border:1px solid #ffffff0d;background:#ffffff05;border-radius:14px}.bar{height:8px;border-radius:999px;overflow:hidden;background:#ffffff0d;margin-top:7px}.fill{height:100%;border-radius:999px;background:linear-gradient(90deg,var(--cyan),var(--violet));box-shadow:0 0 16px #67e8ff22}.fill.red{background:linear-gradient(90deg,var(--red),var(--orange));box-shadow:0 0 16px #ff6b8528}
+.funnel{display:grid;gap:8px}.funnelrow{padding:11px;border-radius:14px;border:1px solid #ffffff0d;background:#ffffff05}.funnel-num{font-weight:800;font-size:16px}.flag{padding:11px 12px;border-radius:14px;border:1px solid #ffffff0d;background:#ffffff05;margin-top:8px}.flag.bad{border-color:#ff6b8544}.flag.warn{border-color:#ffd36d44}
+.rangebar{display:flex;gap:8px;align-items:center;flex-wrap:wrap}.rangebar select{padding:8px 10px}
+.chart{height:190px;display:flex;align-items:flex-end;gap:5px;padding-top:12px;border-bottom:1px solid #ffffff10}.daybar{flex:1;min-width:5px;background:linear-gradient(180deg,#67e8ffcc,#786ef8aa);border-radius:6px 6px 0 0;position:relative;transition:.15s}.daybar:hover{filter:brightness(1.25)}.chartlabels{display:flex;justify-content:space-between;color:var(--muted);font-size:10px;margin-top:6px}
+.ranklist{display:grid;gap:8px}.rankrow{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:10px;align-items:center}.rankname{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.mini{height:6px;background:#ffffff0c;border-radius:99px;overflow:hidden;margin-top:5px}.minifill{height:100%;background:linear-gradient(90deg,#6ea8ff,#a987ff)}
+table{width:100%;border-collapse:collapse}th,td{text-align:left;padding:10px 7px;border-bottom:1px solid #ffffff0d;font-size:12px;vertical-align:top}th{color:#b7c8e7;text-transform:uppercase;letter-spacing:.07em;font-size:10px}.scrollx{overflow:auto}
+.diaggrid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}.diag{padding:12px;border-radius:14px;background:#ffffff05;border:1px solid #ffffff0d}.ok{color:var(--green)}.warn{color:var(--yellow)}.bad{color:var(--red)}
+.log{padding:12px;white-space:pre-wrap;word-break:break-word;max-height:240px;overflow:auto;border-radius:14px;background:#040711;border:1px solid #ffffff0d;color:#b9c9e5;font:11px/1.5 ui-monospace,SFMono-Regular,Consolas,monospace}
+.coverage{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}.coverage .softbox b{display:block;margin-bottom:3px}.footer{margin-top:16px;color:var(--muted);font-size:11px}
+.loading{opacity:.55}.section{margin-top:12px}
+@media(max-width:1050px){.kpis{grid-template-columns:repeat(2,1fr)}.grid2,.grid2even{grid-template-columns:1fr}.grid3{grid-template-columns:1fr 1fr}}
+@media(max-width:700px){.wrap{padding:14px}.setupgrid,.grid3,.diaggrid,.coverage{grid-template-columns:1fr}.metric{font-size:30px}.hero{padding:17px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<section class="hero glass">
+ <div class="top">
+  <div>
+   <div class="brandline"><span class="live-dot"></span>NEBULA • ANALYTICS COMMAND CENTER</div>
+   <h1>Player, Gameplay & Web Health</h1>
+   <div class="muted">Realtime telemetry, historical trends, acquisition, devices, funnels, error classification and telemetry QA. <span class="tiny">Admin-enabled build 3.1</span></div>
+  </div>
+  <div class="actions">
+   <span id="status" class="pill">● Not connected</span>
+   <button id="refreshBtn" class="btn">Refresh all</button>
+   <button id="authBtn" class="btn primary">Connect Google Analytics</button>
+  </div>
+ </div>
+ <div id="setup" class="setup">
+  <b>One-time setup</b>
+  <div class="small muted">Enter the non-secret OAuth Web Client ID and your Google Cloud Project ID. Never paste a client secret or service-account key here.</div>
+  <div class="setupgrid">
+   <input id="clientId" placeholder="OAuth Client ID (...apps.googleusercontent.com)">
+   <input id="projectId" placeholder="Google Cloud Project ID">
+   <button id="saveBtn" class="btn primary">Save setup</button>
+  </div>
+ </div>
+</section>
+
+<nav class="tabs">
+ <button class="tab active" data-tab="live">Live</button>
+ <button class="tab" data-tab="overview">Overview</button>
+ <button class="tab" data-tab="gameplay">Gameplay</button>
+ <button class="tab" data-tab="stability">Web Stability</button>
+ <button class="tab" data-tab="audience">Audience</button>
+ <button class="tab" data-tab="acquisition">Acquisition</button>
+ <button class="tab" data-tab="admin">Admin Setup</button>
+ <button class="tab" data-tab="telemetry">Telemetry QA</button>
+</nav>
+
+<div id="live" class="page">
+ <section class="kpis">
+  <div class="card glass good"><div class="metric-label">Active now</div><div id="liveActive" class="metric">—</div><div class="metric-sub">users in the last 30 minutes</div></div>
+  <div class="card glass"><div class="metric-label">Live events</div><div id="liveEvents" class="metric">—</div><div class="metric-sub">all events in the last 30 minutes</div></div>
+  <div class="card glass"><div class="metric-label">Gameplay starts</div><div id="liveStarts" class="metric">—</div><div class="metric-sub">nebula_gameplay_started</div></div>
+  <div class="card glass danger"><div class="metric-label">Web errors</div><div id="liveErrors" class="metric">—</div><div class="metric-sub">nebula_web_error</div></div>
+ </section>
+ <section class="grid2">
+  <div class="panel glass"><div class="panelhead"><div><h2>Realtime event stream</h2><div class="small muted">Last 30 minutes • auto-refresh every 15 seconds</div></div><span id="updated" class="small muted">Waiting</span></div><div id="liveEventList" class="events"><div class="muted">Connect Google Analytics to begin.</div></div></div>
+  <div class="panel glass"><h2>Live gameplay activity</h2><div id="liveFunnel" class="funnel section"></div><h2 class="section">Live QA flags</h2><div id="liveFlags"></div></div>
+ </section>
+</div>
+
+<div id="overview" class="page hidden">
+ <div class="rangebar"><span class="muted">Historical window</span><select id="rangeSelect"><option value="7">Last 7 days</option><option value="30" selected>Last 30 days</option><option value="90">Last 90 days</option></select><button id="reloadHistory" class="btn">Reload</button></div>
+ <section class="kpis">
+  <div class="card glass"><div class="metric-label">Active users</div><div id="histUsers" class="metric">—</div><div class="metric-sub">selected period</div></div>
+  <div class="card glass"><div class="metric-label">New users</div><div id="histNew" class="metric">—</div><div class="metric-sub">selected period</div></div>
+  <div class="card glass"><div class="metric-label">Sessions</div><div id="histSessions" class="metric">—</div><div class="metric-sub">selected period</div></div>
+  <div class="card glass"><div class="metric-label">Engagement rate</div><div id="histEngagement" class="metric">—</div><div class="metric-sub">engaged sessions / sessions</div></div>
+ </section>
+ <section class="grid2">
+  <div class="panel glass"><div class="panelhead"><div><h2>Daily event trend</h2><div class="small muted">All GA4 events by day</div></div><div id="trendTotal" class="small muted"></div></div><div id="trendChart" class="chart"></div><div id="trendLabels" class="chartlabels"></div></div>
+  <div class="panel glass"><h2>Session quality</h2><div id="qualityList" class="section"></div></div>
+ </section>
+ <section class="panel glass section"><h2>Top events</h2><div id="histEventList" class="ranklist section"></div></section>
+</div>
+
+<div id="gameplay" class="page hidden">
+ <section class="grid2">
+  <div class="panel glass"><div class="panelhead"><div><h2>Gameplay stage reach</h2><div class="small muted">Uses unique active users per event, not raw event-count conversion.</div></div></div><div id="histFunnel" class="funnel"></div></div>
+  <div class="panel glass"><h2>Gameplay event volume</h2><div id="gameEventVolume" class="ranklist section"></div></div>
+ </section>
+ <section class="grid3 section">
+  <div class="panel glass"><h2>Song source</h2><div id="sourceBreakdown" class="section muted">Loading registered <code>source</code> dimension…</div></div>
+  <div class="panel glass"><h2>Difficulty</h2><div id="difficultyBreakdown" class="section muted">Loading registered <code>difficulty</code> dimension…</div></div>
+  <div class="panel glass"><h2>Gameplay outcomes</h2><div id="outcomeBreakdown" class="section muted">Loading registered <code>outcome</code> dimension…</div></div>
+ </section>
+ <section class="grid2even section">
+  <div class="panel glass"><h2>Screen activity</h2><div id="screenBreakdown" class="section muted">Loading registered <code>screen_name</code> dimension…</div></div>
+  <div class="panel glass"><h2>Chart origin</h2><div id="chartOriginBreakdown" class="section muted">Loading registered <code>chart_origin</code> dimension…</div></div>
+ </section>
+</div>
+
+<div id="stability" class="page hidden">
+ <section class="kpis">
+  <div class="card glass danger"><div class="metric-label">Errors in period</div><div id="periodErrors" class="metric">—</div><div class="metric-sub">nebula_web_error</div></div>
+  <div class="card glass"><div class="metric-label">Error-affected users</div><div id="errorUsers" class="metric">—</div><div class="metric-sub">unique users firing error event</div></div>
+  <div class="card glass"><div class="metric-label">Errors / gameplay start</div><div id="errorsPerStart" class="metric">—</div><div class="metric-sub">diagnostic ratio</div></div>
+  <div class="card glass"><div class="metric-label">Current version rows</div><div id="versionRowsCount" class="metric">—</div><div class="metric-sub">processed custom-dimension rows</div></div>
+ </section>
+ <section class="panel glass"><h2>Error classifier</h2><div class="small muted">Area × error code × app version. New custom dimensions can lag behind Realtime.</div><div class="scrollx"><table><thead><tr><th>Area</th><th>Error code</th><th>Version</th><th>Count</th></tr></thead><tbody id="errorTable"><tr><td colspan="4" class="muted">Waiting for processed data.</td></tr></tbody></table></div></section>
+ <section class="panel glass section"><h2>Release/version health</h2><div class="small muted">Compares Web error events and gameplay starts by your custom <code>app_version</code> parameter.</div><div id="versionHealth" class="section"></div></section>
+</div>
+
+<div id="audience" class="page hidden">
+ <section class="grid2even">
+  <div class="panel glass"><h2>Devices & operating systems</h2><div id="deviceList" class="ranklist section"></div></div>
+  <div class="panel glass"><h2>Countries</h2><div id="countryList" class="ranklist section"></div></div>
+ </section>
+</div>
+
+<div id="acquisition" class="page hidden">
+ <section class="grid2">
+  <div class="panel glass"><h2>Session source / medium</h2><div id="sourceMediumList" class="ranklist section"></div></div>
+  <div class="panel glass"><h2>Acquisition notes</h2><div class="softbox section"><b>Direct</b><div class="small muted">Typed/bookmarked/unattributed navigation.</div></div><div class="softbox section"><b>Referral / AI / social</b><div class="small muted">Useful once external traffic grows enough to compare.</div></div><div class="softbox section"><b>Do not overread tiny samples</b><div class="small muted">A handful of users can make channel percentages look profound. They are not.</div></div></div>
+ </section>
+</div>
+
+
+<div id="admin" class="page hidden">
+ <section class="panel glass">
+  <div class="panelhead">
+   <div>
+    <h2>GA4 Admin Setup</h2>
+    <div class="small muted">Audits and creates Nebula custom dimensions, custom metrics, and key events. It never deletes or archives anything.</div>
+   </div>
+   <div class="actions">
+    <button id="adminAuditBtn" class="btn">Audit GA4 setup</button>
+    <button id="adminCreateAllBtn" class="btn primary" disabled>Create all missing</button>
+   </div>
+  </div>
+
+  <div class="softbox">
+   <b>Why this exists</b>
+   <div class="small muted">Nebula can send dozens of useful parameters, but GA4 cannot group/report most custom parameters until they are registered. This page does the repetitive Google-Admin work for you while skipping anything that already exists.</div>
+  </div>
+
+  <div class="section" style="display:flex;gap:10px;align-items:flex-start">
+   <input id="adminConfirm" type="checkbox" style="width:auto;margin-top:3px">
+   <label for="adminConfirm" class="small">I understand this will create missing GA4 definitions on property <b>554874001</b>. It will not delete, archive, or modify existing definitions.</label>
+  </div>
+ </section>
+
+ <section class="kpis">
+  <div class="card glass"><div class="metric-label">Dimensions</div><div id="adminDimSummary" class="metric">—</div><div class="metric-sub">recommended / missing</div></div>
+  <div class="card glass"><div class="metric-label">Metrics</div><div id="adminMetricSummary" class="metric">—</div><div class="metric-sub">recommended / missing</div></div>
+  <div class="card glass"><div class="metric-label">Key events</div><div id="adminKeySummary" class="metric">—</div><div class="metric-sub">recommended / missing</div></div>
+  <div class="card glass"><div class="metric-label">GA4 Schema</div><div id="adminApiState" class="metric" style="font-size:24px">Not audited</div><div class="metric-sub">Admin API registry status</div></div>
+ </section>
+
+ <section class="grid3">
+  <div class="panel glass">
+   <div class="panelhead"><div><h2>Custom dimensions</h2><div id="adminDimSlots" class="tiny muted">Audit to inspect current slots.</div></div><button id="adminCreateDimsBtn" class="btn" disabled>Create missing</button></div>
+   <div id="adminDimList" class="events"><div class="muted">Not audited yet.</div></div>
+  </div>
+  <div class="panel glass">
+   <div class="panelhead"><div><h2>Custom metrics</h2><div id="adminMetricSlots" class="tiny muted">Audit to inspect current slots.</div></div><button id="adminCreateMetricsBtn" class="btn" disabled>Create missing</button></div>
+   <div id="adminMetricList" class="events"><div class="muted">Not audited yet.</div></div>
+  </div>
+  <div class="panel glass">
+   <div class="panelhead"><div><h2>Key events</h2><div id="adminKeySlots" class="tiny muted">Audit to inspect current slots.</div></div><button id="adminCreateKeysBtn" class="btn" disabled>Create missing</button></div>
+   <div id="adminKeyList" class="events"><div class="muted">Not audited yet.</div></div>
+  </div>
+ </section>
+
+ <section class="panel glass section">
+  <h2>Important gameplay-completion note</h2>
+  <div class="small muted section">This setup deliberately does <b>not</b> mark <code>nebula_gameplay_ended</code> as a key event because that event can also represent failure, quit, or restart. Later, emit a dedicated <code>nebula_song_completed</code> event (or create a derived event for outcome=completed) and mark that as a key event instead. Counting quits as successful completions would produce beautifully polished nonsense.</div>
+ </section>
+
+ <section class="panel glass section">
+  <div class="panelhead"><div><h2>Admin progress log</h2><div class="small muted">Creation runs sequentially so Google errors are easy to identify.</div></div><button id="adminClearLogBtn" class="btn">Clear</button></div>
+  <div id="adminLog" class="log">Ready. Run Audit GA4 setup first.</div>
+ </section>
+</div>
+
+<div id="telemetry" class="page hidden">
+ <section class="diaggrid">
+  <div class="diag"><div class="metric-label">OAuth</div><b id="diagOAuth">Not connected</b></div>
+  <div class="diag"><div class="metric-label">Realtime API</div><b id="diagRealtime">Not tested</b></div>
+  <div class="diag"><div class="metric-label">Reporting API</div><b id="diagReporting">Not tested</b></div>
+ </section>
+ <section class="panel glass section">
+  <div class="panelhead">
+    <div>
+      <h2>GA4 schema status</h2>
+      <div class="small muted">Registration and reportability are separate. A definition can exist in GA4 before the Reporting API has processed fresh events for it.</div>
+    </div>
+    <span id="schemaBadge" class="pill">Not audited</span>
+  </div>
+  <div id="schemaSummary" class="coverage section"></div>
+</section>
+
+<section class="panel glass section"><h2>Telemetry coverage</h2><div class="coverage section" id="coverage"></div></section>
+ <section class="panel glass section"><div class="panelhead"><div><h2>Diagnostics log</h2><div class="small muted">Useful when Google decides to communicate entirely through 403s.</div></div><button id="clearLog" class="btn">Clear</button></div><div id="diagLog" class="log">Ready.</div></section>
+</div>
+
+<div class="footer">Realtime refresh: 15s. Historical refresh: manual / on connect. OAuth tokens stay in memory only. Only the non-secret OAuth Client ID and Google Cloud Project ID are saved locally.</div>
+</div>
+
+<script>
+const PROPERTY='554874001',SCOPE='https://www.googleapis.com/auth/analytics.readonly https://www.googleapis.com/auth/analytics.edit';
+const RT=`https://analyticsdata.googleapis.com/v1beta/properties/${PROPERTY}:runRealtimeReport`;
+const RP=`https://analyticsdata.googleapis.com/v1beta/properties/${PROPERTY}:runReport`;
+let token=null,tokenClient=null,liveTimer=null,currentRange=30,histEvents={},histEventUsers={};
+const $=id=>document.getElementById(id);
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const pct=x=>Number.isFinite(x)?(x*100).toFixed(x*100<10?1:0)+'%':'—';
+const fmt=x=>Number(x||0).toLocaleString();
+const sec=x=>{x=Number(x||0);if(x<60)return x.toFixed(0)+'s';return Math.floor(x/60)+'m '+Math.round(x%60)+'s'};
+function log(msg){const e=$('diagLog'),t=new Date().toLocaleTimeString();e.textContent+=`\\n[${t}] ${msg}`;e.scrollTop=e.scrollHeight}
+function setStatus(t,on=false){$('status').textContent='● '+t;$('status').className='pill'+(on?' live':'')}
+function d(id,t,cls=''){const e=$(id);e.textContent=t;e.className=cls}
+function saved(){ $('clientId').value=localStorage.getItem('nebula_client')||'';$('projectId').value=localStorage.getItem('nebula_project')||'';if($('clientId').value&&$('projectId').value)$('setup').classList.add('hidden')}saved();
+function loadGIS(){return new Promise((ok,no)=>{if(window.google?.accounts?.oauth2)return ok();let s=document.createElement('script');s.src='https://accounts.google.com/gsi/client';s.async=true;s.defer=true;s.onload=ok;s.onerror=()=>no(Error('Could not load Google Identity Services'));document.head.appendChild(s)})}
+async function connect(){
+ try{
+  const c=$('clientId').value.trim()||localStorage.getItem('nebula_client'),p=$('projectId').value.trim()||localStorage.getItem('nebula_project');
+  if(!c||!p){$('setup').classList.remove('hidden');throw Error('Client ID and Project ID are required.')}
+  await loadGIS();
+  tokenClient=google.accounts.oauth2.initTokenClient({client_id:c,scope:SCOPE,callback:r=>{
+   if(r.error){d('diagOAuth','Failed','bad');setStatus('OAuth failed');log('OAuth error: '+JSON.stringify(r));return}
+   token=r.access_token;d('diagOAuth','Connected','ok');setStatus('Connected',true);$('setup').classList.add('hidden');log('OAuth connected. Loading live and historical reports.');refreshAll();clearInterval(liveTimer);liveTimer=setInterval(loadLive,15000)
+  }});
+  tokenClient.requestAccessToken({prompt:''});
+ }catch(e){setStatus(e.message);log(e.message)}
+}
+async function api(url,body){
+ if(!token)throw Error('Not connected');
+ const project=$('projectId').value.trim()||localStorage.getItem('nebula_project');
+ let r=await fetch(url,{method:'POST',headers:{Authorization:'Bearer '+token,'Content-Type':'application/json','x-goog-user-project':project},body:JSON.stringify(body)});
+ let txt=await r.text(),j={};try{j=txt?JSON.parse(txt):{}}catch{}
+ if(!r.ok){let reason=j.error?.details?.[0]?.reason||j.error?.status||'';throw Error((j.error?.message||`HTTP ${r.status}`)+(reason?` [${reason}]`:''))}
+ return j
+}
+function eventRows(j){return (j.rows||[]).map(r=>({name:r.dimensionValues?.[0]?.value||'(unknown)',count:+(r.metricValues?.[0]?.value||0),users:+(r.metricValues?.[1]?.value||0)}))}
+async function loadLive(){
+ try{
+  let j=await api(RT,{dimensions:[{name:'eventName'}],metrics:[{name:'eventCount'}],minuteRanges:[{startMinutesAgo:29,endMinutesAgo:0}],orderBys:[{metric:{metricName:'eventCount'},desc:true}],limit:'100'});
+  const rows=eventRows(j),m={};let total=0;rows.forEach(r=>{m[r.name]=r.count;total+=r.count});
+  let a=await api(RT,{metrics:[{name:'activeUsers'}],minuteRanges:[{startMinutesAgo:29,endMinutesAgo:0}]});let active=+(a.rows?.[0]?.metricValues?.[0]?.value||0);
+  $('liveActive').textContent=fmt(active);$('liveEvents').textContent=fmt(total);$('liveStarts').textContent=fmt(m.nebula_gameplay_started||0);$('liveErrors').textContent=fmt(m.nebula_web_error||0);
+  renderLiveEvents(rows);renderLiveFunnel(m);renderLiveFlags(m,total,active);$('updated').textContent='Updated '+new Date().toLocaleTimeString();
+  d('diagRealtime',rows.length?`Working • ${rows.length} event types`:'Working • no live events','ok');log(`Realtime: ${total} events, ${active} active users. eventName is queried with eventCount only; activeUsers is queried separately for GA4 Realtime compatibility.`);
+ }catch(e){d('diagRealtime','Failed','bad');setStatus('Realtime API error');log('Realtime ERROR: '+e.message)}
+}
+function renderLiveEvents(rows){const mx=Math.max(1,...rows.map(r=>r.count));$('liveEventList').innerHTML=rows.length?rows.map(r=>`<div class="event"><div class="row"><span>${esc(r.name)}</span><b>${fmt(r.count)}</b></div><div class="bar"><div class="fill ${r.name==='nebula_web_error'?'red':''}" style="width:${Math.max(3,r.count/mx*100)}%"></div></div></div>`).join(''):'<div class="muted">Realtime API works. No events in the last 30 minutes.</div>'}
+function renderLiveFunnel(m){let s=[['Launch','nebula_game_launch'],['Onboarding completed','nebula_onboarding_completed'],['Calibration completed','nebula_calibration_completed'],['Song selected','nebula_song_selected'],['Chart generated','nebula_chart_generated'],['Gameplay started','nebula_gameplay_started'],['Gameplay ended','nebula_gameplay_ended']];$('liveFunnel').innerHTML=s.map(([n,k],i)=>`<div class="funnelrow row" style="margin-left:${i*5}px"><span>${n}</span><span class="funnel-num">${fmt(m[k]||0)}</span></div>`).join('')}
+function renderLiveFlags(m,total,active){let o=[];if(m.nebula_web_error)o.push(`<div class="flag bad"><b>${m.nebula_web_error} Web error${m.nebula_web_error===1?'':'s'}</b><div class="small muted">Inspect Stability when processed dimensions catch up.</div></div>`);if((m.nebula_chart_generated||0)>(m.nebula_song_selected||0)&&(m.nebula_song_selected||0)>0)o.push(`<div class="flag warn"><b>Chart generations exceed selections</b><div class="small muted">Could be deliberate retesting or duplicate emission.</div></div>`);if(!o.length)o.push(`<div class="flag"><b>No obvious live telemetry anomaly</b><div class="small muted">${active} active • ${total} events.</div></div>`);$('liveFlags').innerHTML=o.join('')}
+
+async function report(dimensions,metrics,extra={}){
+ return api(RP,{dateRanges:[{startDate:`${currentRange}daysAgo`,endDate:'today'}],dimensions:dimensions.map(name=>({name})),metrics:metrics.map(name=>({name})),...extra})
+}
+async function loadHistory(){
+ try{
+  currentRange=+$('rangeSelect').value;
+  const summary=await report([],['activeUsers','newUsers','sessions','engagedSessions','engagementRate','averageSessionDuration','userEngagementDuration','eventCount','sessionsPerUser']);
+  let v=summary.rows?.[0]?.metricValues||[],n=i=>+(v[i]?.value||0);
+  $('histUsers').textContent=fmt(n(0));$('histNew').textContent=fmt(n(1));$('histSessions').textContent=fmt(n(2));$('histEngagement').textContent=pct(n(4));
+  $('qualityList').innerHTML=[
+   ['Engaged sessions',fmt(n(3))],['Average session duration',sec(n(5))],['Average engagement / active user',sec(n(0)>0?n(6)/n(0):0)],['Total engagement time',sec(n(6))],['Total events',fmt(n(7))],['Sessions / user',n(8).toFixed(2)]
+  ].map(([a,b])=>`<div class="softbox row"><span>${a}</span><b>${b}</b></div>`).join('');
+  await Promise.all([loadTrend(),loadHistoricalEvents(),loadAudience(),loadAcquisition(),loadErrorClassifier(),loadVersionHealth(),loadOptionalBreakdowns()]);
+  d('diagReporting','Working','ok');log(`Historical reports loaded for ${currentRange} days.`);
+ }catch(e){d('diagReporting','Failed','bad');log('Reporting ERROR: '+e.message)}
+}
+async function loadTrend(){let j=await report(['date'],['eventCount'],{orderBys:[{dimension:{dimensionName:'date'}}]});let rows=(j.rows||[]).map(r=>({d:r.dimensionValues[0].value,v:+r.metricValues[0].value})),mx=Math.max(1,...rows.map(x=>x.v)),sum=rows.reduce((a,x)=>a+x.v,0);$('trendTotal').textContent=fmt(sum)+' events';$('trendChart').innerHTML=rows.map(x=>`<div class="daybar" title="${x.d}: ${x.v} events" style="height:${Math.max(3,x.v/mx*100)}%"></div>`).join('');if(rows.length){let f=formatDate(rows[0].d),l=formatDate(rows[rows.length-1].d);$('trendLabels').innerHTML=`<span>${f}</span><span>${l}</span>`}else $('trendChart').innerHTML='<div class="muted">No trend data.</div>'}
+function formatDate(s){if(!s||s.length<8)return s;return s.slice(4,6)+'/'+s.slice(6,8)}
+async function loadHistoricalEvents(){let j=await report(['eventName'],['eventCount','activeUsers'],{orderBys:[{metric:{metricName:'eventCount'},desc:true}],limit:'100'});let rows=eventRows(j);histEvents={};histEventUsers={};rows.forEach(r=>{histEvents[r.name]=r.count;histEventUsers[r.name]=r.users});rank('histEventList',rows.slice(0,20).map(r=>[r.name,r.count,`${r.users} users`]));renderHistFunnel(rows);renderGameVolume(rows);let e=histEvents.nebula_web_error||0,s=histEvents.nebula_gameplay_started||0;$('periodErrors').textContent=fmt(e);$('errorUsers').textContent=fmt(histEventUsers.nebula_web_error||0);$('errorsPerStart').textContent=s?(e/s).toFixed(2):'—'}
+function renderHistFunnel(rows){let steps=[['Launch','nebula_game_launch'],['Onboarding started','nebula_onboarding_started'],['Onboarding completed','nebula_onboarding_completed'],['Calibration completed','nebula_calibration_completed'],['Song selected','nebula_song_selected'],['Chart generated','nebula_chart_generated'],['Gameplay started','nebula_gameplay_started'],['Gameplay ended','nebula_gameplay_ended'],['Results viewed','nebula_results_viewed']];$('histFunnel').innerHTML=steps.map(([n,k],i)=>`<div class="funnelrow row"><div><b>${n}</b><div class="tiny muted">${fmt(histEvents[k]||0)} events</div></div><span class="funnel-num">${fmt(histEventUsers[k]||0)} users</span></div>`).join('')}
+function renderGameVolume(rows){let r=rows.filter(x=>x.name.startsWith('nebula_')).sort((a,b)=>b.count-a.count);rank('gameEventVolume',r.map(x=>[x.name,x.count,`${x.users} users`]))}
+function rank(id,items){let mx=Math.max(1,...items.map(x=>x[1]));$(id).innerHTML=items.length?items.map(([n,v,sub])=>`<div class="rankrow"><div><div class="rankname">${esc(n)}</div><div class="mini"><div class="minifill" style="width:${v/mx*100}%"></div></div>${sub?`<div class="tiny muted">${esc(sub)}</div>`:''}</div><b>${fmt(v)}</b></div>`).join(''):'<div class="muted">No data.</div>'}
+async function loadAudience(){let [dev,country]=await Promise.all([report(['deviceCategory','operatingSystem'],['activeUsers','sessions'],{orderBys:[{metric:{metricName:'activeUsers'},desc:true}],limit:'20'}),report(['country'],['activeUsers','sessions'],{orderBys:[{metric:{metricName:'activeUsers'},desc:true}],limit:'20'})]);rank('deviceList',(dev.rows||[]).map(r=>[`${r.dimensionValues[0].value} • ${r.dimensionValues[1].value}`,+(r.metricValues[0].value||0),`${r.metricValues[1].value} sessions`]));rank('countryList',(country.rows||[]).map(r=>[r.dimensionValues[0].value,+(r.metricValues[0].value||0),`${r.metricValues[1].value} sessions`]))}
+async function loadAcquisition(){let j=await report(['sessionSourceMedium'],['sessions','activeUsers'],{orderBys:[{metric:{metricName:'sessions'},desc:true}],limit:'30'});rank('sourceMediumList',(j.rows||[]).map(r=>[r.dimensionValues[0].value,+(r.metricValues[0].value||0),`${r.metricValues[1].value} users`]))}
+async function loadErrorClassifier(){try{let j=await report(['customEvent:area','customEvent:error_code','customEvent:app_version'],['eventCount'],{dimensionFilter:{filter:{fieldName:'eventName',stringFilter:{matchType:'EXACT',value:'nebula_web_error'}}},orderBys:[{metric:{metricName:'eventCount'},desc:true}],limit:'100'});let rows=j.rows||[];$('versionRowsCount').textContent=fmt(rows.length);$('errorTable').innerHTML=rows.length?rows.map(r=>`<tr><td>${esc(r.dimensionValues[0].value)}</td><td>${esc(r.dimensionValues[1].value)}</td><td>${esc(r.dimensionValues[2].value)}</td><td>${fmt(r.metricValues[0].value)}</td></tr>`).join(''):'<tr><td colspan="4" class="muted">No processed post-registration errors yet.</td></tr>'}catch(e){$('versionRowsCount').textContent='—';$('errorTable').innerHTML=`<tr><td colspan="4" class="muted">${esc(e.message)}</td></tr>`;log('Custom error dimensions: '+e.message)}}
+async function loadVersionHealth(){try{let j=await report(['customEvent:app_version','eventName'],['eventCount'],{dimensionFilter:{inListFilter:{fieldName:'eventName',values:['nebula_web_error','nebula_gameplay_started','nebula_gameplay_ended']}},limit:'200'});let m={};(j.rows||[]).forEach(r=>{let ver=r.dimensionValues[0].value||'(not set)',ev=r.dimensionValues[1].value,c=+r.metricValues[0].value;(m[ver]??={})[ev]=c});let rows=Object.entries(m);$('versionHealth').innerHTML=rows.length?rows.map(([v,o])=>{let er=o.nebula_web_error||0,st=o.nebula_gameplay_started||0,en=o.nebula_gameplay_ended||0;return `<div class="softbox row"><div><b>${esc(v)}</b><div class="tiny muted">${st} starts • ${en} ends</div></div><div class="${er?'bad':'ok'}"><b>${er} errors</b></div></div>`}).join(''):'<div class="muted">No processed version data yet.</div>'}catch(e){$('versionHealth').innerHTML='<div class="muted">Version dimension is still processing or unavailable.</div>'}}
+async function optionalDimension(id,dim,eventNames,label){
+ const registered=adminState.dimensions.some(x=>x.parameterName===dim);
+ if(!registered){
+  $(id).innerHTML=`<div class="flag warn"><b>${label} is not registered in GA4</b><div class="small muted">Create Event-scoped custom dimension <code>${dim}</code> in Admin Setup.</div></div>`;
+  return false;
+ }
+ try{
+  let j=await report([`customEvent:${dim}`],['eventCount'],{
+   dimensionFilter:{inListFilter:{fieldName:'eventName',values:eventNames}},
+   orderBys:[{metric:{metricName:'eventCount'},desc:true}],
+   limit:'30'
+  });
+  let rows=j.rows||[];
+  if(rows.length){
+   rank(id,rows.map(r=>[r.dimensionValues[0].value,+(r.metricValues[0].value||0),'events']));
+  }else{
+   $(id).innerHTML=`<div class="flag"><b>${label} is registered ✓</b><div class="small muted">No reportable values yet in this date range. GA4 does not backfill old events from before registration, so generate fresh Nebula telemetry and allow processing time.</div></div>`;
+  }
+  return true;
+ }catch(e){
+  $(id).innerHTML=`<div class="flag"><b>${label} is registered ✓</b><div class="small muted">GA4 Admin confirms <code>${dim}</code> exists. The Reporting API has not exposed it yet. Fresh post-registration events plus GA4 processing can take time.</div></div>`;
+  log(`Registered custom dimension ${dim} is not reportable yet: ${e.message}`);
+  return true;
+ }
+}
+async function loadOptionalBreakdowns(){let results=await Promise.all([
+ optionalDimension('sourceBreakdown','source',['nebula_song_selected','nebula_gameplay_started','nebula_gameplay_ended'],'Song source'),
+ optionalDimension('difficultyBreakdown','difficulty',['nebula_song_selected','nebula_gameplay_started','nebula_gameplay_ended'],'Difficulty'),
+ optionalDimension('outcomeBreakdown','outcome',['nebula_gameplay_ended'],'Gameplay outcome'),
+ optionalDimension('screenBreakdown','screen_name',['nebula_screen_view'],'Screen name'),
+ optionalDimension('chartOriginBreakdown','chart_origin',['nebula_song_selected','nebula_gameplay_started','nebula_gameplay_ended'],'Chart origin')
+ ]);renderCoverage(results)}
+function renderCoverage(optional=[]){
+ let core=['nebula_game_launch','nebula_screen_view','nebula_song_selected','nebula_chart_generated','nebula_gameplay_started','nebula_gameplay_ended','nebula_web_error'];
+ let boxes=core.map(e=>`<div class="softbox"><b>${esc(e)}</b><div class="small ${histEvents[e]?'ok':'muted'}">${histEvents[e]?`${fmt(histEvents[e])} events in range`:'No events in selected range'}</div></div>`);
+ let names=['source','difficulty','outcome','screen_name','chart_origin'];
+ names.forEach((name,i)=>{
+  const registered=adminState.dimensions.some(x=>x.parameterName===name);
+  boxes.push(`<div class="softbox"><b>customEvent:${name}</b><div class="small ${registered?'ok':'warn'}">${registered?'Registered in GA4 ✓':'Missing from GA4'}</div></div>`);
+ });
+ $('coverage').innerHTML=boxes.join('');
+ renderSchemaSummary();
+}
+function renderSchemaSummary(){
+ if(!$('schemaSummary'))return;
+ const dims=adminState.dimensions.length,metrics=adminState.metrics.length,keys=adminState.keyEvents.length;
+ const recommendedDims=RECOMMENDED_DIMENSIONS.length,recommendedMetrics=RECOMMENDED_METRICS.length,recommendedKeys=RECOMMENDED_KEY_EVENTS.length;
+ const missingDims=adminState.missingDimensions.length,missingMetrics=adminState.missingMetrics.length,missingKeys=adminState.missingKeyEvents.length;
+ const complete=adminState.audited && missingDims===0 && missingMetrics===0 && missingKeys===0;
+ $('schemaBadge').textContent=complete?'Schema configured ✓':adminState.audited?'Schema has gaps':'Not audited';
+ $('schemaBadge').className='pill'+(complete?' live':'');
+ $('schemaSummary').innerHTML=[
+  ['Custom dimensions',`${dims} active`,`${missingDims} recommended missing`],
+  ['Custom metrics',`${metrics} active`,`${missingMetrics} recommended missing`],
+  ['Key events',`${keys} active`,`${missingKeys} recommended missing`],
+  ['Reporting status',complete?'Configured':'Needs audit',complete?'Fresh events still need GA4 processing':'Open Admin Setup']
+ ].map(([a,b,c])=>`<div class="softbox"><b>${a}</b><div class="small ${complete?'ok':'muted'}">${b}</div><div class="tiny muted">${c}</div></div>`).join('');
+}
+
+async function refreshAll(){
+ if(!token)return;
+ await loadLive();
+ await auditAdminSetup();
+ await loadHistory();
+}
+
+const ADMIN_BASE=`https://analyticsadmin.googleapis.com/v1beta/properties/${PROPERTY}`;
+const RECOMMENDED_DIMENSIONS=[{"parameterName": "app_version", "displayName": "Nebula App Version", "description": "Build/version that emitted the event.", "scope": "EVENT"}, {"parameterName": "build_type", "displayName": "Build Type", "description": "Development, release, or other controlled build type.", "scope": "EVENT"}, {"parameterName": "screen_name", "displayName": "Screen Name", "description": "Major Nebula screen associated with the event.", "scope": "EVENT"}, {"parameterName": "previous_screen", "displayName": "Previous Screen", "description": "Previous major screen in a navigation transition.", "scope": "EVENT"}, {"parameterName": "tutorial_version", "displayName": "Tutorial Version", "description": "Onboarding/tutorial schema version.", "scope": "EVENT"}, {"parameterName": "step_name", "displayName": "Tutorial Step", "description": "Controlled onboarding or flow step name.", "scope": "EVENT"}, {"parameterName": "stage", "displayName": "Stage", "description": "Controlled stage inside a multi-step flow.", "scope": "EVENT"}, {"parameterName": "calibration_version", "displayName": "Calibration Version", "description": "Calibration flow/version used.", "scope": "EVENT"}, {"parameterName": "reason", "displayName": "Reason", "description": "Controlled reason code for a player/system action.", "scope": "EVENT"}, {"parameterName": "source", "displayName": "Song Source", "description": "Controlled source such as local, Audius, osu, pack, or community.", "scope": "EVENT"}, {"parameterName": "difficulty", "displayName": "Difficulty", "description": "Selected gameplay difficulty.", "scope": "EVENT"}, {"parameterName": "chart_origin", "displayName": "Chart Origin", "description": "Generated, imported, authored, or unknown chart origin.", "scope": "EVENT"}, {"parameterName": "generator_version", "displayName": "Generator Version", "description": "Chart generator/version identifier.", "scope": "EVENT"}, {"parameterName": "failure_reason", "displayName": "Failure Reason", "description": "Controlled low-cardinality failure reason.", "scope": "EVENT"}, {"parameterName": "import_type", "displayName": "Import Type", "description": "Audio, osu, chart, or other import type.", "scope": "EVENT"}, {"parameterName": "outcome", "displayName": "Gameplay Outcome", "description": "Completed, failed, quit, restart, or other controlled outcome.", "scope": "EVENT"}, {"parameterName": "grade", "displayName": "Grade", "description": "Result grade for a completed gameplay run.", "scope": "EVENT"}, {"parameterName": "assist_type", "displayName": "Assist Type", "description": "Controlled assist feature identifier.", "scope": "EVENT"}, {"parameterName": "setting_name", "displayName": "Setting Name", "description": "Controlled setting identifier.", "scope": "EVENT"}, {"parameterName": "value_bucket", "displayName": "Value Bucket", "description": "Bucketed setting or numeric value category.", "scope": "EVENT"}, {"parameterName": "category", "displayName": "Category", "description": "Controlled UI/customization category.", "scope": "EVENT"}, {"parameterName": "unlock_state", "displayName": "Unlock State", "description": "Locked, unlocked, owned, or other controlled unlock state.", "scope": "EVENT"}, {"parameterName": "world_name", "displayName": "World Name", "description": "Nebula reactive-background world/preset identity.", "scope": "EVENT"}, {"parameterName": "theme_name", "displayName": "Theme Name", "description": "Selected visual/note theme.", "scope": "EVENT"}, {"parameterName": "achievement_id", "displayName": "Achievement ID", "description": "Stable achievement identifier.", "scope": "EVENT"}, {"parameterName": "unlock_type", "displayName": "Unlock Type", "description": "Type of progression unlock.", "scope": "EVENT"}, {"parameterName": "unlock_id", "displayName": "Unlock ID", "description": "Stable identifier for the unlocked item.", "scope": "EVENT"}, {"parameterName": "online_state", "displayName": "Online State", "description": "Online, offline, unavailable, or other controlled state.", "scope": "EVENT"}, {"parameterName": "scope", "displayName": "Ranking Scope", "description": "Controlled leaderboard/rankings scope.", "scope": "EVENT"}, {"parameterName": "trigger", "displayName": "Trigger", "description": "Controlled trigger such as automatic or manual.", "scope": "EVENT"}, {"parameterName": "role", "displayName": "Multiplayer Role", "description": "Host, client, spectator, or other multiplayer role.", "scope": "EVENT"}, {"parameterName": "result", "displayName": "Multiplayer Result", "description": "Win, loss, draw, disconnect, or other controlled result.", "scope": "EVENT"}, {"parameterName": "network_type", "displayName": "Network Type", "description": "Controlled network/streaming connection category.", "scope": "EVENT"}, {"parameterName": "service", "displayName": "Network Service", "description": "Backend/service associated with a network event.", "scope": "EVENT"}, {"parameterName": "feature_enabled", "displayName": "Feature Enabled", "description": "Whether a gated feature is enabled.", "scope": "EVENT"}, {"parameterName": "action", "displayName": "Action", "description": "Controlled unsupported or requested action identifier.", "scope": "EVENT"}, {"parameterName": "warning_code", "displayName": "Warning Code", "description": "Controlled Web warning identifier.", "scope": "EVENT"}, {"parameterName": "first_launch", "displayName": "First Launch", "description": "Whether this was the first Nebula launch.", "scope": "EVENT"}, {"parameterName": "first_song", "displayName": "First Song", "description": "Whether this was the player's first song.", "scope": "EVENT"}, {"parameterName": "practice", "displayName": "Practice", "description": "Whether gameplay was in practice mode.", "scope": "EVENT"}, {"parameterName": "autoplay", "displayName": "Autoplay", "description": "Whether autoplay was active.", "scope": "EVENT"}, {"parameterName": "replay", "displayName": "Replay", "description": "Whether the run was a replay.", "scope": "EVENT"}, {"parameterName": "new_personal_best", "displayName": "New Personal Best", "description": "Whether the result was a new personal best.", "scope": "EVENT"}, {"parameterName": "rank_bucket", "displayName": "Rank Bucket", "description": "Bucketed result/ranking position.", "scope": "EVENT"}, {"parameterName": "note_type", "displayName": "Note Type", "description": "Controlled note type used in chart-editor telemetry.", "scope": "EVENT"}];
+const RECOMMENDED_METRICS=[{"parameterName": "generation_time_ms", "displayName": "Chart Generation Time", "description": "Time required to generate a chart.", "measurementUnit": "MILLISECONDS", "scope": "EVENT"}, {"parameterName": "load_time_ms", "displayName": "Load Time", "description": "Time required to load a major resource or screen.", "measurementUnit": "MILLISECONDS", "scope": "EVENT"}, {"parameterName": "duration_seconds", "displayName": "Gameplay Duration", "description": "Duration of gameplay/run activity.", "measurementUnit": "SECONDS", "scope": "EVENT"}, {"parameterName": "pause_duration_seconds", "displayName": "Pause Duration", "description": "Duration of a gameplay pause.", "measurementUnit": "SECONDS", "scope": "EVENT"}, {"parameterName": "note_count", "displayName": "Note Count", "description": "Number of notes in a generated or edited chart.", "measurementUnit": "STANDARD", "scope": "EVENT"}, {"parameterName": "hold_count", "displayName": "Hold Count", "description": "Number of hold notes in a chart.", "measurementUnit": "STANDARD", "scope": "EVENT"}, {"parameterName": "accuracy", "displayName": "Accuracy", "description": "Gameplay accuracy numeric value.", "measurementUnit": "STANDARD", "scope": "EVENT"}, {"parameterName": "max_combo", "displayName": "Maximum Combo", "description": "Maximum combo achieved in a run.", "measurementUnit": "STANDARD", "scope": "EVENT"}, {"parameterName": "perfect_count", "displayName": "Perfect Count", "description": "Perfect judgments in a run summary.", "measurementUnit": "STANDARD", "scope": "EVENT"}, {"parameterName": "great_count", "displayName": "Great Count", "description": "Great judgments in a run summary.", "measurementUnit": "STANDARD", "scope": "EVENT"}, {"parameterName": "good_count", "displayName": "Good Count", "description": "Good judgments in a run summary.", "measurementUnit": "STANDARD", "scope": "EVENT"}, {"parameterName": "miss_count", "displayName": "Miss Count", "description": "Miss judgments in a run summary.", "measurementUnit": "STANDARD", "scope": "EVENT"}];
+const RECOMMENDED_KEY_EVENTS=[{"eventName": "nebula_onboarding_completed", "countingMethod": "ONCE_PER_EVENT", "description": "Player completed onboarding."}, {"eventName": "nebula_calibration_completed", "countingMethod": "ONCE_PER_EVENT", "description": "Player completed calibration."}, {"eventName": "nebula_song_import_completed", "countingMethod": "ONCE_PER_EVENT", "description": "Player successfully imported a song/chart."}, {"eventName": "nebula_editor_saved", "countingMethod": "ONCE_PER_EVENT", "description": "Player successfully saved an edited chart."}, {"eventName": "nebula_community_download_completed", "countingMethod": "ONCE_PER_EVENT", "description": "Player successfully downloaded a community chart."}, {"eventName": "nebula_score_submission_completed", "countingMethod": "ONCE_PER_EVENT", "description": "A score submission completed successfully."}, {"eventName": "nebula_match_completed", "countingMethod": "ONCE_PER_EVENT", "description": "A multiplayer match completed."}, {"eventName": "nebula_cloud_backup_completed", "countingMethod": "ONCE_PER_EVENT", "description": "A cloud backup completed successfully."}];
+
+let adminState={audited:false,dimensions:[],metrics:[],keyEvents:[],missingDimensions:[],missingMetrics:[],missingKeyEvents:[]};
+
+function adminLog(msg){
+ const e=$('adminLog'),t=new Date().toLocaleTimeString();
+ e.textContent+=`\n[${t}] ${msg}`;e.scrollTop=e.scrollHeight;
+}
+
+async function adminRequest(url,method='GET',body=null){
+ if(!token)throw Error('Connect Google Analytics first.');
+ const project=$('projectId').value.trim()||localStorage.getItem('nebula_project');
+ const opts={method,headers:{Authorization:'Bearer '+token,'Content-Type':'application/json','x-goog-user-project':project}};
+ if(body!==null)opts.body=JSON.stringify(body);
+ const r=await fetch(url,opts);
+ const txt=await r.text();let j={};try{j=txt?JSON.parse(txt):{}}catch{}
+ if(!r.ok){
+  const reason=j.error?.details?.[0]?.reason||j.error?.status||'';
+  throw Error((j.error?.message||`HTTP ${r.status}`)+(reason?` [${reason}]`:''));
+ }
+ return j;
+}
+
+async function adminListAll(resource,field){
+ let all=[],pageToken='';
+ do{
+  const qs=new URLSearchParams({pageSize:'200'});
+  if(pageToken)qs.set('pageToken',pageToken);
+  const j=await adminRequest(`${ADMIN_BASE}/${resource}?${qs.toString()}`);
+  all.push(...(j[field]||[]));pageToken=j.nextPageToken||'';
+ }while(pageToken);
+ return all;
+}
+
+function adminRow(name,status,detail=''){
+ const cls=status==='Existing'?'ok':status==='Missing'?'warn':'muted';
+ return `<div class="event"><div class="row"><div><b>${esc(name)}</b>${detail?`<div class="tiny muted">${esc(detail)}</div>`:''}</div><span class="${cls}">${status}</span></div></div>`;
+}
+
+function renderAdminAudit(){
+ const existingDim=new Set(adminState.dimensions.map(x=>x.parameterName));
+ const existingMetric=new Set(adminState.metrics.map(x=>x.parameterName));
+ const existingKeys=new Set(adminState.keyEvents.map(x=>x.eventName));
+ adminState.missingDimensions=RECOMMENDED_DIMENSIONS.filter(x=>!existingDim.has(x.parameterName));
+ adminState.missingMetrics=RECOMMENDED_METRICS.filter(x=>!existingMetric.has(x.parameterName));
+ adminState.missingKeyEvents=RECOMMENDED_KEY_EVENTS.filter(x=>!existingKeys.has(x.eventName));
+
+ $('adminDimSummary').textContent=`${RECOMMENDED_DIMENSIONS.length} / ${adminState.missingDimensions.length}`;
+ $('adminMetricSummary').textContent=`${RECOMMENDED_METRICS.length} / ${adminState.missingMetrics.length}`;
+ $('adminKeySummary').textContent=`${RECOMMENDED_KEY_EVENTS.length} / ${adminState.missingKeyEvents.length}`;
+ $('adminDimSlots').textContent=`${adminState.dimensions.length} active custom dimensions currently listed • GA4 Standard commonly allows 50 event-scoped custom dimensions`;
+ $('adminMetricSlots').textContent=`${adminState.metrics.length} active custom metrics currently listed • GA4 Standard commonly allows 50 custom metrics`;
+ $('adminKeySlots').textContent=`${adminState.keyEvents.length} key events currently listed • custom key-event limits apply`;
+
+ $('adminDimList').innerHTML=RECOMMENDED_DIMENSIONS.map(x=>adminRow(x.displayName,existingDim.has(x.parameterName)?'Existing':'Missing',x.parameterName)).join('');
+ $('adminMetricList').innerHTML=RECOMMENDED_METRICS.map(x=>adminRow(x.displayName,existingMetric.has(x.parameterName)?'Existing':'Missing',`${x.parameterName} • ${x.measurementUnit}`)).join('');
+ $('adminKeyList').innerHTML=RECOMMENDED_KEY_EVENTS.map(x=>adminRow(x.eventName,existingKeys.has(x.eventName)?'Existing':'Missing',x.description)).join('');
+
+ adminState.audited=true;
+ renderSchemaSummary();
+ $('adminApiState').textContent='Configured';
+ $('adminApiState').className='metric ok';
+ syncAdminButtons();
+}
+
+function syncAdminButtons(){
+ const enabled=adminState.audited && $('adminConfirm').checked;
+ $('adminCreateDimsBtn').disabled=!enabled||!adminState.missingDimensions.length;
+ $('adminCreateMetricsBtn').disabled=!enabled||!adminState.missingMetrics.length;
+ $('adminCreateKeysBtn').disabled=!enabled||!adminState.missingKeyEvents.length;
+ $('adminCreateAllBtn').disabled=!enabled||(!adminState.missingDimensions.length&&!adminState.missingMetrics.length&&!adminState.missingKeyEvents.length);
+}
+
+async function auditAdminSetup(){
+ try{
+  if(!token)throw Error('Connect Google Analytics first so the new analytics.edit scope is authorized.');
+  $('adminApiState').textContent='Auditing…';$('adminApiState').className='metric';
+  adminLog('Listing existing custom dimensions, custom metrics, and key events...');
+  const [dims,metrics,keys]=await Promise.all([
+   adminListAll('customDimensions','customDimensions'),
+   adminListAll('customMetrics','customMetrics'),
+   adminListAll('keyEvents','keyEvents')
+  ]);
+  adminState.dimensions=dims;adminState.metrics=metrics;adminState.keyEvents=keys;
+  renderAdminAudit();
+  adminLog(`Audit complete: ${dims.length} dimensions, ${metrics.length} metrics, ${keys.length} key events currently active/listed.`);
+  adminLog(`Missing recommended: ${adminState.missingDimensions.length} dimensions, ${adminState.missingMetrics.length} metrics, ${adminState.missingKeyEvents.length} key events.`);
+ }catch(e){
+  $('adminApiState').textContent='Audit failed';$('adminApiState').className='metric bad';
+  adminLog('AUDIT ERROR: '+e.message);
+ }
+}
+
+async function createMissingDimensions(){
+ for(const x of [...adminState.missingDimensions]){
+  try{
+   adminLog(`Creating dimension: ${x.displayName} (${x.parameterName})...`);
+   await adminRequest(`${ADMIN_BASE}/customDimensions`,'POST',x);
+   adminLog(`✓ Created dimension ${x.parameterName}`);
+  }catch(e){adminLog(`✗ Dimension ${x.parameterName}: ${e.message}`)}
+ }
+ await auditAdminSetup();
+}
+
+async function createMissingMetrics(){
+ for(const x of [...adminState.missingMetrics]){
+  try{
+   adminLog(`Creating metric: ${x.displayName} (${x.parameterName})...`);
+   await adminRequest(`${ADMIN_BASE}/customMetrics`,'POST',x);
+   adminLog(`✓ Created metric ${x.parameterName}`);
+  }catch(e){adminLog(`✗ Metric ${x.parameterName}: ${e.message}`)}
+ }
+ await auditAdminSetup();
+}
+
+async function createMissingKeyEvents(){
+ for(const x of [...adminState.missingKeyEvents]){
+  try{
+   adminLog(`Creating key event: ${x.eventName}...`);
+   await adminRequest(`${ADMIN_BASE}/keyEvents`,'POST',{eventName:x.eventName,countingMethod:x.countingMethod});
+   adminLog(`✓ Created key event ${x.eventName}`);
+  }catch(e){adminLog(`✗ Key event ${x.eventName}: ${e.message}`)}
+ }
+ await auditAdminSetup();
+}
+
+async function createAllMissing(){
+ if(!$('adminConfirm').checked||!adminState.audited)return;
+ const count=adminState.missingDimensions.length+adminState.missingMetrics.length+adminState.missingKeyEvents.length;
+ if(!confirm(`Create ${count} missing GA4 definitions on Nebula property ${PROPERTY}? Existing definitions will be skipped and nothing will be deleted.`))return;
+ adminLog(`Starting create-all for ${count} missing definitions.`);
+ await createMissingDimensions();
+ await createMissingMetrics();
+ await createMissingKeyEvents();
+ adminLog('Create-all pass finished. Review any individual Google errors above.');
+}
+
+$('adminAuditBtn').onclick=auditAdminSetup;
+$('adminCreateDimsBtn').onclick=async()=>{if(confirm(`Create ${adminState.missingDimensions.length} missing custom dimensions?`))await createMissingDimensions()};
+$('adminCreateMetricsBtn').onclick=async()=>{if(confirm(`Create ${adminState.missingMetrics.length} missing custom metrics?`))await createMissingMetrics()};
+$('adminCreateKeysBtn').onclick=async()=>{if(confirm(`Create ${adminState.missingKeyEvents.length} missing key events?`))await createMissingKeyEvents()};
+$('adminCreateAllBtn').onclick=createAllMissing;
+$('adminConfirm').onchange=syncAdminButtons;
+$('adminClearLogBtn').onclick=()=>{$('adminLog').textContent='Cleared.'};
+
+$('authBtn').onclick=connect;$('refreshBtn').onclick=refreshAll;$('reloadHistory').onclick=loadHistory;$('rangeSelect').onchange=loadHistory;
+$('saveBtn').onclick=()=>{let c=$('clientId').value.trim(),p=$('projectId').value.trim();if(!c||!p){log('Both setup fields are required.');return}localStorage.setItem('nebula_client',c);localStorage.setItem('nebula_project',p);$('setup').classList.add('hidden');setStatus('Setup saved');log('Saved Client ID and Project ID locally.')};
+$('clearLog').onclick=()=>{$('diagLog').textContent='Cleared.'};
+document.querySelectorAll('.tab').forEach(b=>b.onclick=()=>{document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));b.classList.add('active');document.querySelectorAll('.page').forEach(x=>x.classList.add('hidden'));$(b.dataset.tab).classList.remove('hidden')});
+$('coverage').innerHTML='<div class="softbox"><b>Waiting for GA4 schema audit</b><div class="small muted">Connect Google Analytics and the dashboard will verify registrations automatically.</div></div>';
+if($('schemaSummary'))$('schemaSummary').innerHTML='<div class="softbox"><b>Waiting for audit</b><div class="small muted">Registration status will appear after connecting.</div></div>';
+</script>
+</body></html>
