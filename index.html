@@ -1,0 +1,126 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Nebula Live Analytics</title>
+  <style>
+    :root{color-scheme:dark;--bg:#060914;--panel:rgba(15,22,43,.72);--line:rgba(154,180,255,.18);--line2:rgba(154,180,255,.3);--text:#eef5ff;--muted:#9ab0d0;--accent:#67e8ff;--accent2:#ae8bff;--good:#68f0ae;--warn:#ffd36d;--bad:#ff6b85;--shadow:0 10px 30px rgba(0,0,0,.32), inset 0 1px 0 rgba(255,255,255,.03);--radius:20px}
+    *{box-sizing:border-box}html,body{height:100%}body{margin:0;color:var(--text);font:14px/1.45 Inter,ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;background:
+    radial-gradient(900px 500px at 10% 0%, rgba(103,232,255,.12), transparent 60%),
+    radial-gradient(700px 500px at 100% 10%, rgba(174,139,255,.13), transparent 55%),
+    radial-gradient(900px 800px at 50% 100%, rgba(67,86,191,.18), transparent 50%),
+    linear-gradient(180deg,#0a1022 0%,#060914 100%);overflow-x:hidden}
+    body:before{content:"";position:fixed;inset:0;pointer-events:none;background-image:
+    radial-gradient(2px 2px at 12% 24%, rgba(255,255,255,.65), transparent 45%),
+    radial-gradient(1.5px 1.5px at 70% 12%, rgba(255,255,255,.45), transparent 45%),
+    radial-gradient(2px 2px at 82% 74%, rgba(255,255,255,.55), transparent 45%),
+    radial-gradient(1.5px 1.5px at 24% 70%, rgba(255,255,255,.35), transparent 45%),
+    radial-gradient(1.5px 1.5px at 50% 46%, rgba(255,255,255,.32), transparent 45%),
+    radial-gradient(1.5px 1.5px at 60% 82%, rgba(255,255,255,.25), transparent 45%);opacity:.55}
+    .wrap{max-width:1220px;margin:auto;padding:26px 20px 38px}
+    .hero{position:relative;padding:24px;border:1px solid var(--line);border-radius:28px;background:linear-gradient(180deg, rgba(17,24,46,.78), rgba(10,15,31,.88));box-shadow:var(--shadow);overflow:hidden;backdrop-filter:blur(16px)}
+    .hero-top,.row{display:flex;gap:12px;align-items:center;justify-content:space-between;flex-wrap:wrap}
+    .eyebrow{display:inline-flex;align-items:center;gap:8px;font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:#b8c8e8;opacity:.9}.dot{width:10px;height:10px;border-radius:50%;background:linear-gradient(180deg,var(--accent),#51c4ff);box-shadow:0 0 16px rgba(103,232,255,.65)}
+    h1{margin:8px 0 6px;font-size:32px;line-height:1.05}h2{margin:0;font-size:16px}.sub{color:var(--muted)}.hero-actions{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+    .pill,.btn,input{border:1px solid var(--line);border-radius:999px;background:rgba(255,255,255,.03);color:var(--text)}.pill{padding:8px 12px}.pill.live{border-color:rgba(104,240,174,.35);color:#d8ffe9;box-shadow:inset 0 0 22px rgba(104,240,174,.08)}
+    .btn{padding:10px 14px;cursor:pointer;transition:.18s ease;box-shadow:var(--shadow)}.btn:hover{transform:translateY(-1px);border-color:var(--line2)}.btn.primary{background:linear-gradient(90deg, rgba(103,232,255,.18), rgba(174,139,255,.18));border-color:rgba(143,184,255,.35)}.btn.soft{background:rgba(255,255,255,.025)}
+    .setup{margin-top:16px;padding:16px;border:1px solid var(--line);border-radius:18px;background:rgba(255,255,255,.03)}.hidden{display:none!important}.setup-grid{display:grid;grid-template-columns:1fr auto;gap:10px;margin-top:10px}
+    input{width:100%;padding:12px 14px;outline:none;background:rgba(4,8,18,.52)}input:focus{border-color:rgba(103,232,255,.45);box-shadow:0 0 0 4px rgba(103,232,255,.08)}.note{margin-top:8px;color:var(--muted);font-size:12px}
+    .kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin:18px 0}.card,.panel{position:relative;border:1px solid var(--line);border-radius:var(--radius);background:linear-gradient(180deg, rgba(18,27,52,.72), rgba(11,17,32,.82));box-shadow:var(--shadow);backdrop-filter:blur(14px)}.card{padding:16px}
+    .metric-label{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:#b7c8ea}.metric{font-size:38px;font-weight:800;letter-spacing:-.03em;margin:6px 0 2px}.metric-sub{color:var(--muted);font-size:12px}.danger{border-color:rgba(255,107,133,.35)}.danger .metric{color:#ff8ca2}.accent-card .metric{color:#9bedff}
+    .panes{display:grid;grid-template-columns:1.28fr .92fr;gap:14px}.panel{padding:18px}.panel-top{display:flex;justify-content:space-between;gap:10px;align-items:flex-end;flex-wrap:wrap;margin-bottom:12px}.small{font-size:12px}
+    .events{display:grid;gap:12px;max-height:560px;overflow:auto;padding-right:2px}.event{padding:12px;border-radius:16px;background:rgba(255,255,255,.025);border:1px solid rgba(255,255,255,.04)}.event-name{display:flex;justify-content:space-between;gap:12px;align-items:center}.event-name span{word-break:break-word}.event-count{font-weight:800}
+    .bar{margin-top:9px;height:10px;border-radius:999px;overflow:hidden;background:rgba(255,255,255,.055)}.fill{height:100%;border-radius:999px;background:linear-gradient(90deg,var(--accent),var(--accent2));box-shadow:0 0 18px rgba(103,232,255,.28)}.fill.error{background:linear-gradient(90deg,#ff6b85,#ff9d66);box-shadow:0 0 18px rgba(255,107,133,.28)}
+    .funnel{display:grid;gap:10px;margin-top:8px}.step{padding:12px 14px;border:1px solid rgba(255,255,255,.06);border-radius:16px;background:rgba(255,255,255,.025)}.step span:last-child{font-weight:800}
+    .flags{display:grid;gap:10px;margin-top:10px}.flag{padding:12px 14px;border-radius:16px;border:1px solid rgba(255,255,255,.06);background:rgba(255,255,255,.025)}.flag.warn{border-color:rgba(255,211,109,.28)}.flag.bad{border-color:rgba(255,107,133,.26)}
+    .section{margin-top:14px}.error-table{width:100%;border-collapse:collapse;margin-top:10px}.error-table th,.error-table td{padding:12px 10px;text-align:left;border-bottom:1px solid rgba(255,255,255,.06);vertical-align:top}.error-table th{font-size:12px;color:#b7c8ea;letter-spacing:.08em;text-transform:uppercase}
+    .footer{margin-top:14px;color:var(--muted);font-size:12px}code{padding:2px 6px;border-radius:8px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.05)}
+    @media (max-width:1000px){.panes{grid-template-columns:1fr}}@media (max-width:760px){.wrap{padding:16px 14px 28px}h1{font-size:28px}.kpis{grid-template-columns:repeat(2,1fr)}.metric{font-size:30px}.setup-grid{grid-template-columns:1fr}}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <section class="hero">
+      <div class="hero-top">
+        <div>
+          <div class="eyebrow"><span class="dot"></span> Nebula • Live Analytics</div>
+          <h1>Player & Web Health</h1>
+          <div class="sub">Realtime gameplay telemetry + processed WebGL error classification for GA4 property <strong>554874001</strong></div>
+        </div>
+        <div class="hero-actions">
+          <span id="status" class="pill">● Not connected</span>
+          <button id="refreshBtn" class="btn soft">Refresh now</button>
+          <button id="authBtn" class="btn primary">Connect Google Analytics</button>
+        </div>
+      </div>
+      <div id="setup" class="setup">
+        <strong>One-time setup</strong>
+        <div class="note">Paste a Google OAuth <b>Web Client ID</b>. This is not a secret. Never paste a client secret, service-account key, or API secret into this page.</div>
+        <div class="setup-grid">
+          <input id="clientId" placeholder="1234567890-abc123def456.apps.googleusercontent.com">
+          <button id="saveClientBtn" class="btn primary">Save Client ID</button>
+        </div>
+        <div class="note">In Google Cloud, enable the <b>Google Analytics Data API</b> and add this dashboard’s domain under your OAuth client’s <b>Authorized JavaScript origins</b>. The signed-in Google account must have access to the Nebula GA4 property.</div>
+      </div>
+    </section>
+
+    <section class="kpis">
+      <div class="card accent-card"><div class="metric-label">Active now</div><div id="activeNow" class="metric">—</div><div class="metric-sub">users in the last 30 minutes</div></div>
+      <div class="card"><div class="metric-label">Events</div><div id="eventTotal" class="metric">—</div><div class="metric-sub">all realtime events in the live window</div></div>
+      <div class="card"><div class="metric-label">Gameplay starts</div><div id="gameplayStarts" class="metric">—</div><div class="metric-sub"><code>nebula_gameplay_started</code></div></div>
+      <div class="card danger"><div class="metric-label">Web errors</div><div id="webErrors" class="metric">—</div><div class="metric-sub"><code>nebula_web_error</code></div></div>
+    </section>
+
+    <section class="panes">
+      <div class="panel">
+        <div class="panel-top"><div><h2>Realtime events</h2><div class="sub small">Auto-refreshes every 15 seconds</div></div><div id="lastUpdated" class="sub small">Waiting for data</div></div>
+        <div id="eventList" class="events"><div class="sub">Connect Google Analytics to load realtime data.</div></div>
+      </div>
+      <div class="panel">
+        <div class="panel-top"><div><h2>Live gameplay funnel</h2><div class="sub small">Instrumentation health, not product conversion yet</div></div></div>
+        <div id="funnel" class="funnel"></div>
+        <div class="section"><h2>Live QA flags</h2><div id="flags" class="flags"><div class="sub">Waiting for data.</div></div></div>
+      </div>
+    </section>
+
+    <section class="panel section">
+      <div class="panel-top"><div><h2>Processed Web error classifier</h2><div class="sub small">Uses the standard Reporting API so your new custom dimensions can be grouped</div></div></div>
+      <table class="error-table">
+        <thead><tr><th>Area</th><th>Error code</th><th>Version</th><th>Count</th></tr></thead>
+        <tbody id="errorRows"><tr><td colspan="4" class="sub">Waiting for processed post-registration data.</td></tr></tbody>
+      </table>
+      <div class="note">GA4’s Realtime Data API does not expose event-scoped custom dimensions like <code>area</code> or <code>error_code</code>. This table uses a standard <code>runReport</code> query, so it can lag behind the live counters above.</div>
+    </section>
+
+    <div class="footer">Auto-refresh stays active while this page is open. OAuth access tokens stay in memory only. The browser stores only the non-secret OAuth Client ID locally for convenience.</div>
+  </div>
+
+  <script>
+    const PROPERTY_ID='554874001', OAUTH_SCOPE='https://www.googleapis.com/auth/analytics.readonly';
+    const REALTIME_URL=`https://analyticsdata.googleapis.com/v1beta/properties/${PROPERTY_ID}:runRealtimeReport`;
+    const REPORT_URL=`https://analyticsdata.googleapis.com/v1beta/properties/${PROPERTY_ID}:runReport`;
+    let accessToken=null, tokenClient=null, refreshTimer=null;
+    const $=id=>document.getElementById(id);
+    const savedClientId=localStorage.getItem('nebula_ga_client_id')||'';
+    $('clientId').value=savedClientId; if(savedClientId) $('setup').classList.add('hidden');
+
+    function escapeHtml(v){return String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+    function setStatus(text,connected=false){const el=$('status'); el.textContent='● '+text; el.className='pill'+(connected?' live':'')}
+    function showSetup(){$('setup').classList.remove('hidden')} function hideSetup(){$('setup').classList.add('hidden')}
+    function loadGIS(){return new Promise((ok,no)=>{if(window.google?.accounts?.oauth2) return ok(); const s=document.createElement('script'); s.src='https://accounts.google.com/gsi/client'; s.async=true; s.defer=true; s.onload=ok; s.onerror=()=>no(new Error('Could not load Google Identity Services.')); document.head.appendChild(s)})}
+    async function initializeAuthClient(){const clientId=$('clientId').value.trim()||localStorage.getItem('nebula_ga_client_id'); if(!clientId){showSetup(); throw new Error('Add your OAuth Web Client ID first.')} await loadGIS(); tokenClient=google.accounts.oauth2.initTokenClient({client_id:clientId,scope:OAUTH_SCOPE,callback:(response)=>{if(response.error){setStatus('Authorization failed: '+response.error,false);return} accessToken=response.access_token; setStatus('Connected',true); hideSetup(); refreshAll(); startRefreshTimer();}})}
+    async function connectGoogle(){try{await initializeAuthClient(); tokenClient.requestAccessToken({prompt:accessToken?'':'consent'})}catch(error){setStatus(error.message,false)}}
+    async function gaPost(url,payload){if(!accessToken) throw new Error('Not connected'); const response=await fetch(url,{method:'POST',headers:{'Authorization':'Bearer '+accessToken,'Content-Type':'application/json'},body:JSON.stringify(payload)}); const json=await response.json().catch(()=>({})); if(response.status===401){accessToken=null; setStatus('Session expired',false); throw new Error('Google session expired. Connect again.')} if(!response.ok) throw new Error(json.error?.message||'GA4 API error'); return json}
+    function renderRealtimeEvents(eventMap){const entries=Object.entries(eventMap).sort((a,b)=>b[1]-a[1]); const max=Math.max(1,...entries.map(([,c])=>c)); $('eventList').innerHTML=entries.length?entries.map(([name,count])=>`<div class="event"><div class="event-name"><span>${escapeHtml(name)}</span><span class="event-count">${count}</span></div><div class="bar"><div class="fill ${name==='nebula_web_error'?'error':''}" style="width:${Math.max(3,(count/max)*100)}%"></div></div></div>`).join(''):`<div class="sub">No events in the last 30 minutes.</div>`}
+    function renderFunnel(eventMap){const steps=[['Game launch','nebula_game_launch'],['Calibration started','nebula_calibration_started'],['Song selected','nebula_song_selected'],['Chart generated','nebula_chart_generated'],['Gameplay started','nebula_gameplay_started'],['Gameplay ended','nebula_gameplay_ended']]; $('funnel').innerHTML=steps.map(([label,key],i)=>`<div class="step row" style="margin-left:${i*10}px"><span>${label}</span><span>${eventMap[key]||0}</span></div>`).join('')}
+    function renderFlags(eventMap,totalEvents,activeUsers){const webErrors=eventMap['nebula_web_error']||0, selected=eventMap['nebula_song_selected']||0, generated=eventMap['nebula_chart_generated']||0, started=eventMap['nebula_gameplay_started']||0; const flags=[]; if(webErrors>0) flags.push(`<div class="flag bad"><strong>${webErrors} Web error${webErrors===1?'':'s'}</strong><br><span class="sub">Use the classifier table below once processed data catches up.</span></div>`); if(selected>0 && generated>selected) flags.push(`<div class="flag warn"><strong>Chart generation exceeds song selection</strong><br><span class="sub">${generated} generated vs ${selected} selected. Confirm whether this is deliberate testing or duplicate event emission.</span></div>`); if(generated>0 && started>generated) flags.push(`<div class="flag warn"><strong>Gameplay starts exceed generated charts</strong><br><span class="sub">Review event timing and exactly-once semantics.</span></div>`); if(!flags.length) flags.push(`<div class="flag"><strong>No obvious live telemetry anomaly</strong><br><span class="sub">${activeUsers} active users and ${totalEvents} events in the current live window.</span></div>`); $('flags').innerHTML=flags.join('')}
+    async function loadRealtimeData(){const eventResponse=await gaPost(REALTIME_URL,{dimensions:[{name:'eventName'}],metrics:[{name:'eventCount'}],minuteRanges:[{startMinutesAgo:29,endMinutesAgo:0}],orderBys:[{metric:{metricName:'eventCount'},desc:true}],limit:'100'}); const eventMap={}; let totalEvents=0; (eventResponse.rows||[]).forEach(row=>{const name=row.dimensionValues?.[0]?.value||'(unknown)'; const count=Number(row.metricValues?.[0]?.value||0); eventMap[name]=count; totalEvents+=count}); const activeResponse=await gaPost(REALTIME_URL,{metrics:[{name:'activeUsers'}],minuteRanges:[{startMinutesAgo:29,endMinutesAgo:0}]}); const activeUsers=Number(activeResponse.rows?.[0]?.metricValues?.[0]?.value||0); $('activeNow').textContent=activeUsers; $('eventTotal').textContent=totalEvents; $('gameplayStarts').textContent=eventMap['nebula_gameplay_started']||0; $('webErrors').textContent=eventMap['nebula_web_error']||0; renderRealtimeEvents(eventMap); renderFunnel(eventMap); renderFlags(eventMap,totalEvents,activeUsers)}
+    async function loadProcessedErrorTable(){try{const response=await gaPost(REPORT_URL,{dateRanges:[{startDate:'today',endDate:'today'}],dimensions:[{name:'customEvent:area'},{name:'customEvent:error_code'},{name:'customEvent:app_version'}],metrics:[{name:'eventCount'}],dimensionFilter:{filter:{fieldName:'eventName',stringFilter:{matchType:'EXACT',value:'nebula_web_error'}}},orderBys:[{metric:{metricName:'eventCount'},desc:true}],limit:'50'}); const rows=response.rows||[]; $('errorRows').innerHTML=rows.length?rows.map(row=>`<tr><td>${escapeHtml(row.dimensionValues?.[0]?.value||'(not set)')}</td><td>${escapeHtml(row.dimensionValues?.[1]?.value||'(not set)')}</td><td>${escapeHtml(row.dimensionValues?.[2]?.value||'(not set)')}</td><td>${escapeHtml(row.metricValues?.[0]?.value||'0')}</td></tr>`).join(''):`<tr><td colspan="4" class="sub">No processed post-registration errors yet.</td></tr>`}catch(error){$('errorRows').innerHTML=`<tr><td colspan="4" class="sub">${escapeHtml(error.message)} — custom dimensions may still be processing.</td></tr>`}}
+    async function refreshAll(){if(!accessToken) return; try{await loadRealtimeData(); await loadProcessedErrorTable(); $('lastUpdated').textContent='Updated '+new Date().toLocaleTimeString(); setStatus('Connected',true)}catch(error){setStatus(error.message,false); $('lastUpdated').textContent='Refresh failed'}}
+    function startRefreshTimer(){clearInterval(refreshTimer); refreshTimer=setInterval(refreshAll,15000)}
+    $('saveClientBtn').addEventListener('click',()=>{const value=$('clientId').value.trim(); if(!value) return; localStorage.setItem('nebula_ga_client_id', value); hideSetup(); setStatus('Client ID saved', false)})
+    $('authBtn').addEventListener('click', connectGoogle); $('refreshBtn').addEventListener('click', refreshAll);
+  </script>
+</body>
+</html>
